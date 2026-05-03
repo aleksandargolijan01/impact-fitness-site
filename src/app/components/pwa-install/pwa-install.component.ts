@@ -13,7 +13,7 @@ import { PwaInstallService } from '../../services/pwa-install.service';
           aria-label="Zatvori poruku za instalaciju"
           (click)="dismiss()"
         >
-          ×
+          &times;
         </button>
         <div>
           <strong>Impact Fitness</strong>

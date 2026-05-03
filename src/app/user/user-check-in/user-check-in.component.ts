@@ -10,6 +10,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import jsQR from 'jsqr';
 import { AuthService } from '../../services/auth.service';
 import { CheckInService, VALID_CHECK_IN_QR_CODE } from '../../services/check-in.service';
@@ -18,7 +19,7 @@ import { RouterLink } from '@angular/router';
 @Component({
   selector: 'app-user-check-in',
   standalone: true,
-  imports: [RouterLink],
+  imports: [FormsModule, RouterLink],
   template: `
     <div class="panel-page">
       <div class="panel-heading">
@@ -77,6 +78,18 @@ import { RouterLink } from '@angular/router';
               </button>
             }
           </div>
+
+          <label>
+            Test unos QR koda
+            <input
+              [(ngModel)]="manualQrCode"
+              name="manualQrCode"
+              placeholder="IMPACT_GYM_CHECKIN"
+            />
+          </label>
+          <button class="btn btn--ghost" type="button" (click)="submitManualQrCode()">
+            Testiraj QR kod
+          </button>
         </section>
       }
 
@@ -133,6 +146,7 @@ export class UserCheckInComponent implements OnDestroy {
   readonly successTotalCount = signal(0);
   readonly successMessage = signal('');
   readonly errorMessage = signal('');
+  manualQrCode = '';
 
   readonly myCheckIns = computed(() => {
     const userId = this.authService.currentUser()?.id;
@@ -149,11 +163,6 @@ export class UserCheckInComponent implements OnDestroy {
 
     if (!user) {
       this.errorMessage.set('Morate biti ulogovani za cekiranje.');
-      return;
-    }
-
-    if (!this.checkInService.canCreateCheckIn(user.id)) {
-      this.errorMessage.set('Vec ste se cekirali. Sledece cekiranje je moguce kasnije.');
       return;
     }
 
@@ -222,6 +231,9 @@ export class UserCheckInComponent implements OnDestroy {
 
   private async handleScan(value: string): Promise<void> {
     const user = this.authService.currentUser();
+    const scannedValue = value.trim();
+
+    console.log('QR value:', scannedValue);
 
     if (!user) {
       this.stopScanner();
@@ -229,7 +241,7 @@ export class UserCheckInComponent implements OnDestroy {
       return;
     }
 
-    if (value !== VALID_CHECK_IN_QR_CODE) {
+    if (scannedValue !== VALID_CHECK_IN_QR_CODE) {
       this.stopScanner();
       this.errorMessage.set('QR kod nije validan za Impact Fitness.');
       return;
@@ -238,17 +250,16 @@ export class UserCheckInComponent implements OnDestroy {
     this.isSavingScan = true;
 
     try {
+      console.log('Creating check-in for user:', user.id);
       await this.checkInService.createCheckIn({
         userId: user.id,
         fullName: user.fullName,
         email: user.email,
-        qrCodeValue: value,
+        qrCodeValue: scannedValue,
       });
 
-      this.successMonthlyCount.set(
-        this.checkInService.getMonthlyCheckInsByUserId(user.id).length + 1,
-      );
-      this.successTotalCount.set(this.checkInService.getCheckInsByUserId(user.id).length + 1);
+      this.successMonthlyCount.set(this.checkInService.getMonthlyCheckInsByUserId(user.id).length);
+      this.successTotalCount.set(this.checkInService.getCheckInsByUserId(user.id).length);
       this.checkInSuccess.set(true);
       this.successMessage.set('Cekiranje je uspesno evidentirano.');
       this.stopScanner();
@@ -261,6 +272,10 @@ export class UserCheckInComponent implements OnDestroy {
           : 'Cekiranje trenutno nije sacuvano. Proverite vezu i pokusajte ponovo.',
       );
     }
+  }
+
+  async submitManualQrCode(): Promise<void> {
+    await this.handleScan(this.manualQrCode);
   }
 
   private scanFrame(video: HTMLVideoElement): void {

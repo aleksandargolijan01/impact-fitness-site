@@ -53,3 +53,18 @@ p {
     aspect-ratio: 16 / 10;
   }
 }
+
+@media (max-width: 480px) {
+  .trainer-grid {
+    gap: 14px;
+    margin-top: 26px;
+  }
+
+  .trainer-grid div {
+    padding: 18px;
+  }
+
+  img {
+    aspect-ratio: 4 / 3;
+  }
+}

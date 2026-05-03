@@ -1,4 +1,4 @@
-<section class="section section--alt" id="services">
+<section class="section section--alt" id="trainings">
   <div class="container">
     <p class="section-kicker">Usluge i treninzi</p>
     <h2 class="section-title">Treniraj u grupi. Napreduj brze.</h2>
@@ -20,7 +20,9 @@
         <span>?</span>
         <h3>Raspored treninga</h3>
         <p>Pogledaj termine svih grupnih treninga i pronadji ono sto ti odgovara.</p>
-        <a class="btn btn--primary" href="#schedule">Vidi raspored</a>
+        <a class="btn btn--primary" href="#schedule" (click)="scrollService.goToSection('schedule', $event)"
+          >Vidi raspored</a
+        >
       </article>
     </div>
   </div>

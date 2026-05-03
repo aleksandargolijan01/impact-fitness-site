@@ -6,8 +6,10 @@
       <div class="footer-install">
         @if (pwaInstall.isInstalled()) {
           <span>Aplikacija je vec instalirana.</span>
-        } @else {
+        } @else if (pwaInstall.canInstall()) {
           <button type="button" (click)="installApp()">Instaliraj Impact aplikaciju</button>
+        } @else {
+          <span>{{ pwaInstall.installUnavailableMessage() }}</span>
         }
 
         @if (installMessage()) {
@@ -16,11 +18,13 @@
       </div>
     </div>
     <div class="footer-links">
-      <a href="#hero">Pocetna</a>
-      <a href="#services">Treninzi</a>
-      <a href="#pricing">Cenovnik</a>
-      <a href="#booking">Probni trening</a>
-      <a href="#contact">Kontakt</a>
+      <a href="#home" (click)="scrollService.goToSection('home', $event)">Pocetna</a>
+      <a href="#trainings" (click)="scrollService.goToSection('trainings', $event)">Treninzi</a>
+      <a href="#pricing" (click)="scrollService.goToSection('pricing', $event)">Cenovnik</a>
+      <a href="#booking-form" (click)="scrollService.goToSection('booking-form', $event)"
+        >Probni trening</a
+      >
+      <a href="#contact" (click)="scrollService.goToSection('contact', $event)">Kontakt</a>
     </div>
   </div>
 </footer>

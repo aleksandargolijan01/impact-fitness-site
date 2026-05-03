@@ -13,6 +13,7 @@ export const VALID_CHECK_IN_QR_CODE = 'IMPACT_GYM_CHECKIN';
 export class CheckInService {
   private readonly collectionPath = 'checkIns';
   private readonly checkInCooldownMs = 2 * 60 * 60 * 1000;
+  private readonly enforceCheckInCooldown = false;
   private readonly authService = inject(AuthService);
   private readonly firestore = inject(FirestoreCollectionService);
   private readonly checkInsState = signal<CheckIn[]>([]);
@@ -57,12 +58,15 @@ export class CheckInService {
     });
   }
 
-  async createCheckIn(checkIn: CreateCheckInPayload): Promise<void> {
-    if (checkIn.qrCodeValue !== VALID_CHECK_IN_QR_CODE) {
+  async createCheckIn(checkIn: CreateCheckInPayload): Promise<CheckIn> {
+    const normalizedQrCodeValue = this.normalizeQrCode(checkIn.qrCodeValue);
+    console.log('Creating check-in for user:', checkIn.userId);
+
+    if (normalizedQrCodeValue !== VALID_CHECK_IN_QR_CODE) {
       throw new Error('INVALID_QR_CODE');
     }
 
-    if (!this.canCreateCheckIn(checkIn.userId)) {
+    if (this.enforceCheckInCooldown && !this.canCreateCheckIn(checkIn.userId)) {
       throw new Error('CHECK_IN_TOO_SOON');
     }
 
@@ -73,12 +77,21 @@ export class CheckInService {
       date: this.toDateKey(now),
       time: this.toTimeKey(now),
       createdAt: now.toISOString(),
+      qrCodeValue: normalizedQrCodeValue,
     };
 
-    await this.firestore.set(this.collectionPath, {
-      ...item,
-      createdAt: serverTimestamp() as unknown as string,
-    });
+    try {
+      await this.firestore.set(this.collectionPath, {
+        ...item,
+        createdAt: serverTimestamp() as unknown as string,
+      });
+      this.upsertLocalCheckIn(item);
+
+      return item;
+    } catch (error) {
+      console.error('Creating check-in Firestore write failed', error);
+      throw error;
+    }
   }
 
   async createManualCheckIn(user: CurrentUser): Promise<void> {
@@ -121,6 +134,10 @@ export class CheckInService {
   }
 
   canCreateCheckIn(userId: string): boolean {
+    if (!this.enforceCheckInCooldown) {
+      return true;
+    }
+
     const latestCheckIn = this.getCheckInsByUserId(userId)[0];
 
     if (!latestCheckIn) {
@@ -142,6 +159,19 @@ export class CheckInService {
 
   private sortCheckIns(checkIns: CheckIn[]): CheckIn[] {
     return [...checkIns].sort((a, b) => this.toSortKey(b).localeCompare(this.toSortKey(a)));
+  }
+
+  private upsertLocalCheckIn(checkIn: CheckIn): void {
+    this.checkInsState.set(
+      this.sortCheckIns([
+        checkIn,
+        ...this.checkInsState().filter((existingCheckIn) => existingCheckIn.id !== checkIn.id),
+      ]),
+    );
+  }
+
+  private normalizeQrCode(value: string): string {
+    return value.trim();
   }
 
   private toSortKey(checkIn: CheckIn): string {

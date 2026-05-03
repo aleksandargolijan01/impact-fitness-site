@@ -76,6 +76,19 @@ export class UserGoalService {
       year,
     };
 
-    await this.firestore.set(this.collectionPath, goal);
+    try {
+      await this.firestore.set(this.collectionPath, goal);
+      this.upsertLocalGoal(goal);
+    } catch (error) {
+      console.error('Saving monthly goal Firestore write failed', error);
+      throw error;
+    }
+  }
+
+  private upsertLocalGoal(goal: UserGoal): void {
+    this.goalsState.set([
+      goal,
+      ...this.goalsState().filter((existingGoal) => existingGoal.id !== goal.id),
+    ]);
   }
 }

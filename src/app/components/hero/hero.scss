@@ -29,6 +29,7 @@
   grid-template-columns: minmax(0, 740px) minmax(260px, 360px);
   gap: 48px;
   align-items: end;
+  min-width: 0;
 }
 
 .hero-copy {
@@ -149,5 +150,54 @@
 
   .hero-panel {
     max-width: 420px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    padding: 56px 14px 48px;
+  }
+
+  .hero-grid {
+    gap: 24px;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(2.45rem, 15vw, 4rem);
+    line-height: 0.98;
+  }
+
+  .hero-copy p:not(.section-kicker) {
+    margin-top: 18px;
+    font-size: 1rem;
+    line-height: 1.62;
+  }
+
+  .hero-actions .btn {
+    width: 100%;
+  }
+
+  .hero-proof span {
+    min-height: 34px;
+    font-size: 0.82rem;
+  }
+
+  .hero-panel {
+    max-width: none;
+    padding: 18px;
+  }
+
+  .hero-panel strong {
+    font-size: 2.35rem;
+  }
+}
+
+@media (max-width: 390px) {
+  .hero {
+    padding-inline: 12px;
+  }
+
+  .hero-proof {
+    gap: 8px;
   }
 }

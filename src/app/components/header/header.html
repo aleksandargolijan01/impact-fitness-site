@@ -1,9 +1,9 @@
 <header class="site-header" [class.is-scrolled]="isScrolled()" [class.menu-open]="isMenuOpen()">
   <a
     class="brand"
-    href="#hero"
+    href="#home"
     aria-label="Impact Fitness pocetna"
-    (click)="scrollToSection('hero', $event)"
+    (click)="scrollToSection('home', $event)"
   >
     <span class="brand-mark">IF</span>
     <span>Impact Fitness</span>
@@ -59,9 +59,9 @@
 
     <a
       class="header-cta"
-      href="#booking"
-      [class.active]="activeSection() === 'booking'"
-      (click)="scrollToSection('booking', $event)"
+      href="#booking-form"
+      [class.active]="activeSection() === 'booking-form'"
+      (click)="scrollToSection('booking-form', $event)"
     >
       Zakazi trening
     </a>

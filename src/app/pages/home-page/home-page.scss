@@ -22,6 +22,7 @@ main {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--line);
+  min-width: 0;
 }
 
 .trust-strip article {
@@ -64,6 +65,7 @@ main {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px 18px;
+  min-width: 0;
 }
 
 .ps__bridge {
@@ -120,6 +122,7 @@ main {
   grid-template-columns: minmax(0, 0.85fr) minmax(320px, 1.15fr);
   gap: 36px;
   align-items: start;
+  min-width: 0;
 }
 
 .result-cards {
@@ -214,6 +217,7 @@ main {
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
   margin-top: 36px;
+  min-width: 0;
 }
 
 .schedule-grid article {
@@ -317,6 +321,15 @@ main {
 }
 
 @media (max-width: 620px) {
+  .trust-strip {
+    padding: 12px 14px;
+  }
+
+  .trust-strip article {
+    min-height: 0;
+    padding: 16px;
+  }
+
   .ps {
     padding-block: 44px;
   }
@@ -335,7 +348,66 @@ main {
   }
 
   .schedule-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 26px;
+  }
+
+  .schedule-grid article {
+    min-height: 0;
+    padding: 18px;
+  }
+
+  .schedule-grid h3 {
+    margin-top: 24px;
+    font-size: 1.2rem;
+  }
+
+  .schedule-grid small {
+    padding-top: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .result-cards article {
+    padding: 18px;
+  }
+
+  .result-cards .btn {
+    width: 100%;
+  }
+
+  .faq__item button {
+    min-height: 56px;
+    padding: 14px 16px;
+  }
+
+  .faq__item.is-open p {
+    max-height: 220px;
+    padding-inline: 16px;
+  }
+
+  .schedule-note {
+    width: 100%;
+    font-size: 0.9rem;
+  }
+
+  .whatsapp-float {
+    right: 14px;
+    bottom: 14px;
+    width: 52px;
+    height: 52px;
+  }
+}
+
+@media (max-width: 390px) {
+  .ps__bridge {
+    width: 100%;
+    text-align: center;
+  }
+
+  .faq__item button {
+    gap: 10px;
   }
 }
 

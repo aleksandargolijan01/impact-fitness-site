@@ -17,7 +17,12 @@
         </p>
       </div>
       <div class="contact-actions">
-        <a class="btn btn--primary" href="#booking">Zakazi probni trening</a>
+        <a
+          class="btn btn--primary"
+          href="#booking-form"
+          (click)="scrollService.goToSection('booking-form', $event)"
+          >Zakazi probni trening</a
+        >
         <a class="btn btn--ghost" href="tel:+381600000000">Pozovi gym</a>
       </div>
     </div>

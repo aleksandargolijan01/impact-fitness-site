@@ -3,6 +3,7 @@
   grid-template-columns: minmax(0, 0.9fr) minmax(320px, 1.1fr);
   gap: 48px;
   align-items: start;
+  min-width: 0;
 }
 
 .booking-form {
@@ -50,6 +51,7 @@
 label {
   display: grid;
   gap: 8px;
+  min-width: 0;
   color: #f2f3f5;
   font-weight: 800;
 }
@@ -185,5 +187,29 @@ button:disabled:hover {
 
   .booking-copy {
     position: static;
+  }
+}
+
+@media (max-width: 480px) {
+  .booking-grid {
+    gap: 28px;
+  }
+
+  .booking-form {
+    gap: 14px;
+    padding: 18px;
+  }
+
+  .booking-steps {
+    margin-top: 20px;
+  }
+
+  .booking-steps span {
+    padding: 12px 14px;
+  }
+
+  button {
+    width: 100%;
+    min-height: 48px;
   }
 }

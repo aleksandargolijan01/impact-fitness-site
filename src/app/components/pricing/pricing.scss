@@ -100,3 +100,30 @@ li::before {
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 480px) {
+  .pricing-grid {
+    gap: 14px;
+    margin-top: 26px;
+  }
+
+  .pricing-grid article {
+    padding: 20px;
+  }
+
+  .featured,
+  .featured:hover {
+    transform: none;
+  }
+
+  .badge {
+    position: static;
+    display: inline-flex;
+    width: fit-content;
+    margin-bottom: 14px;
+  }
+
+  ul {
+    margin-top: 18px;
+  }
+}

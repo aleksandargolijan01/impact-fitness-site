@@ -1,5 +1,12 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { MembershipApplication } from '../../models/membership-application.model';
@@ -7,6 +14,7 @@ import { AuthService } from '../../services/auth.service';
 import { CheckInService } from '../../services/check-in.service';
 import { MembershipApplicationService } from '../../services/membership-application.service';
 import { NotificationService } from '../../services/notification.service';
+import { ScrollService } from '../../services/scroll.service';
 import { UserGoalService } from '../../services/user-goal.service';
 
 @Component({
@@ -45,6 +53,10 @@ import { UserGoalService } from '../../services/user-goal.service';
             <strong>Trenutno:</strong>
             {{ monthlyCheckIns().length }}/{{ currentGoal()?.monthlyGoal || selectedGoal() }}
           </p>
+          <div class="progress-meter" aria-label="Napredak ka mesecnom cilju">
+            <span [style.width.%]="goalProgress()"></span>
+          </div>
+          <p>{{ goalProgressText() }}</p>
           <label>
             Izaberi cilj
             <select [ngModel]="selectedGoal()" (ngModelChange)="selectedGoal.set($event)">
@@ -69,10 +81,10 @@ import { UserGoalService } from '../../services/user-goal.service';
             }}</span>
           </p>
           <p>{{ membership.expirationText }}</p>
-          <a class="btn btn--ghost" href="/#pricing">Produzi clanarinu</a>
+          <a class="btn btn--ghost" href="/#pricing" (click)="scrollService.goToSection('pricing', $event)">Produzi clanarinu</a>
         } @else {
           <p>Nemate aktivnu clanarinu.</p>
-          <a class="btn btn--primary" href="/#pricing">Pogledaj pakete</a>
+          <a class="btn btn--primary" href="/#pricing" (click)="scrollService.goToSection('pricing', $event)">Pogledaj pakete</a>
         }
       </section>
 
@@ -94,9 +106,13 @@ import { UserGoalService } from '../../services/user-goal.service';
                 </tr>
               } @else {
                 @for (notification of notificationService.notifications(); track notification.id) {
-                  <tr>
+                  <tr [class.is-unread]="!notification.read">
                     <td data-label="Poruka">{{ notification.message }}</td>
-                    <td data-label="Tip">{{ notification.type }}</td>
+                    <td data-label="Tip">
+                      <span class="status-badge status-badge--neutral">
+                        {{ notification.read ? 'Procitano' : 'Novo' }}
+                      </span>
+                    </td>
                     <td data-label="Datum">{{ notification.createdAt | date: 'short' }}</td>
                   </tr>
                 } @empty {
@@ -116,6 +132,7 @@ import { UserGoalService } from '../../services/user-goal.service';
 export class UserProgressComponent {
   readonly authService = inject(AuthService);
   readonly notificationService = inject(NotificationService);
+  readonly scrollService = inject(ScrollService);
   private readonly checkInService = inject(CheckInService);
   private readonly goalService = inject(UserGoalService);
   private readonly membershipService = inject(MembershipApplicationService);
@@ -123,6 +140,16 @@ export class UserProgressComponent {
   readonly selectedGoal = signal(12);
   readonly successMessage = signal('');
   readonly errorMessage = signal('');
+
+  constructor() {
+    effect(() => {
+      const savedGoal = this.currentGoal()?.monthlyGoal;
+
+      if (savedGoal) {
+        this.selectedGoal.set(savedGoal);
+      }
+    });
+  }
 
   readonly myCheckIns = computed(() => {
     const userId = this.authService.currentUser()?.id;
@@ -145,6 +172,19 @@ export class UserProgressComponent {
   readonly lastCheckInLabel = computed(() =>
     this.checkInService.formatCheckIn(this.myCheckIns()[0]),
   );
+  readonly goalProgress = computed(() => {
+    const goal = this.currentGoal()?.monthlyGoal || this.selectedGoal();
+
+    return Math.min(100, Math.round((this.monthlyCheckIns().length / goal) * 100));
+  });
+  readonly goalProgressText = computed(() => {
+    const goal = this.currentGoal()?.monthlyGoal || this.selectedGoal();
+    const remaining = goal - this.monthlyCheckIns().length;
+
+    return remaining > 0
+      ? `Jos ${remaining} dolazaka do mesecnog cilja.`
+      : 'Mesecni cilj je ispunjen.';
+  });
   readonly mostActiveDay = computed(() => this.getMostActiveDay());
   readonly latestMembership = computed(() => {
     const user = this.authService.currentUser();

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 
@@ -13,12 +13,12 @@ import { AuthService } from '../../services/auth.service';
         <h1>Uredi podatke</h1>
       </div>
 
-      @if (successMessage) {
-        <div class="success" role="status">{{ successMessage }}</div>
+      @if (successMessage()) {
+        <div class="success" role="status">{{ successMessage() }}</div>
       }
 
-      @if (errorMessage) {
-        <div class="error" role="alert">{{ errorMessage }}</div>
+      @if (errorMessage()) {
+        <div class="error" role="alert">{{ errorMessage() }}</div>
       }
 
       <form class="card panel-form" [formGroup]="form" (ngSubmit)="save()">
@@ -26,8 +26,8 @@ import { AuthService } from '../../services/auth.service';
         <label>Email <input type="email" formControlName="email" /></label>
         <label>Telefon <input formControlName="phone" /></label>
         <label>Novi password <input type="password" formControlName="password" /></label>
-        <button class="btn btn--primary full" type="submit" [disabled]="isSaving">
-          {{ isSaving ? 'Cuvanje...' : 'Sacuvaj profil' }}
+        <button class="btn btn--primary full" type="submit" [disabled]="isSaving()">
+          {{ isSaving() ? 'Cuvanje...' : 'Sacuvaj profil' }}
         </button>
       </form>
     </div>
@@ -37,9 +37,10 @@ import { AuthService } from '../../services/auth.service';
 export class UserProfileComponent {
   readonly authService = inject(AuthService);
   private readonly fb = inject(FormBuilder);
-  successMessage = '';
-  errorMessage = '';
-  isSaving = false;
+  readonly successMessage = signal('');
+  readonly errorMessage = signal('');
+  readonly isSaving = signal(false);
+  private syncedUserId = '';
 
   readonly form = this.fb.nonNullable.group({
     fullName: [this.authService.currentUser()?.fullName ?? '', Validators.required],
@@ -47,6 +48,24 @@ export class UserProfileComponent {
     phone: [this.authService.currentUser()?.phone ?? '', Validators.required],
     password: ['', Validators.minLength(6)],
   });
+
+  constructor() {
+    effect(() => {
+      const user = this.authService.currentUser();
+
+      if (!user || user.id === this.syncedUserId) {
+        return;
+      }
+
+      this.syncedUserId = user.id;
+      this.form.patchValue({
+        fullName: user.fullName,
+        email: user.email,
+        phone: user.phone,
+        password: '',
+      });
+    });
+  }
 
   async save(): Promise<void> {
     if (this.form.invalid) {
@@ -62,19 +81,19 @@ export class UserProfileComponent {
       ...(raw.password ? { password: raw.password } : {}),
     };
 
-    this.isSaving = true;
+    this.isSaving.set(true);
+    this.successMessage.set('');
+    this.errorMessage.set('');
 
     try {
       await this.authService.updateProfile(updates);
       this.form.patchValue({ password: '' });
-      this.successMessage = 'Profil je sacuvan.';
-      this.errorMessage = '';
+      this.successMessage.set('Profil je sacuvan.');
     } catch (error) {
       console.error('Updating user profile failed', error);
-      this.successMessage = '';
-      this.errorMessage = 'Profil trenutno nije sacuvan. Pokusaj ponovo.';
+      this.errorMessage.set('Profil trenutno nije sacuvan. Pokusaj ponovo.');
     } finally {
-      this.isSaving = false;
+      this.isSaving.set(false);
     }
   }
 }

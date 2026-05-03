@@ -12,6 +12,7 @@ import { DOCUMENT } from '@angular/common';
 import { PLATFORM_ID } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { ScrollService } from '../../services/scroll.service';
 
 interface NavItem {
   id: string;
@@ -27,6 +28,7 @@ interface NavItem {
 })
 export class Header implements OnDestroy {
   readonly authService = inject(AuthService);
+  readonly scrollService = inject(ScrollService);
   private readonly router = inject(Router);
   private readonly document = inject(DOCUMENT);
   private readonly platformId = inject(PLATFORM_ID);
@@ -34,13 +36,15 @@ export class Header implements OnDestroy {
 
   readonly navItems: NavItem[] = [
     { id: 'about', label: 'O nama' },
-    { id: 'services', label: 'Treninzi' },
+    { id: 'trainings', label: 'Treninzi' },
+    { id: 'schedule', label: 'Raspored' },
     { id: 'pricing', label: 'Cenovnik' },
     { id: 'trainers', label: 'Treneri' },
+    { id: 'faq', label: 'FAQ' },
     { id: 'contact', label: 'Kontakt' },
   ];
 
-  readonly activeSection = signal('hero');
+  readonly activeSection = signal('home');
   readonly isMenuOpen = signal(false);
   readonly isScrolled = signal(false);
 
@@ -74,15 +78,9 @@ export class Header implements OnDestroy {
 
   scrollToSection(sectionId: string, event?: Event): void {
     event?.preventDefault();
-
-    const section = this.document.getElementById(sectionId);
-
-    if (section) {
-      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      this.activeSection.set(sectionId);
-    }
-
     this.closeMenu();
+    void this.scrollService.goToSection(sectionId);
+    this.activeSection.set(sectionId);
   }
 
   async logout(): Promise<void> {
@@ -96,7 +94,7 @@ export class Header implements OnDestroy {
   }
 
   private observeSections(): void {
-    const sectionIds = ['hero', ...this.navItems.map((item) => item.id), 'booking'];
+    const sectionIds = ['home', ...this.navItems.map((item) => item.id), 'booking-form'];
     const sections = sectionIds
       .map((id) => this.document.getElementById(id))
       .filter((section): section is HTMLElement => !!section);

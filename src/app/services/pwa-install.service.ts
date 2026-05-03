@@ -16,6 +16,8 @@ export class PwaInstallService {
   private readonly deferredPrompt = signal<BeforeInstallPromptEvent | null>(null);
   private readonly dismissed = signal(false);
   private readonly installed = signal(false);
+  private readonly iosDevice = signal(false);
+  private readonly secureContext = signal(false);
 
   private readonly installAvailable = computed(() => !!this.deferredPrompt() && !this.installed());
   readonly shouldShowPrompt = computed(() => this.canInstall() && !this.isDismissed());
@@ -26,6 +28,8 @@ export class PwaInstallService {
     }
 
     this.dismissed.set(localStorage.getItem(this.dismissedKey) === 'true');
+    this.secureContext.set(window.isSecureContext);
+    this.iosDevice.set(this.detectIosDevice());
 
     window.addEventListener('beforeinstallprompt', (event) => {
       event.preventDefault();
@@ -37,7 +41,7 @@ export class PwaInstallService {
       this.deferredPrompt.set(null);
     });
 
-    if (window.matchMedia?.('(display-mode: standalone)').matches) {
+    if (window.matchMedia?.('(display-mode: standalone)').matches || this.isIosStandalone()) {
       this.installed.set(true);
     }
   }
@@ -52,6 +56,30 @@ export class PwaInstallService {
 
   isInstalled(): boolean {
     return this.installed();
+  }
+
+  isIos(): boolean {
+    return this.iosDevice();
+  }
+
+  isSecure(): boolean {
+    return this.secureContext();
+  }
+
+  installUnavailableMessage(): string {
+    if (this.isInstalled()) {
+      return 'Aplikacija je vec instalirana.';
+    }
+
+    if (this.isIos()) {
+      return 'Na iPhone-u otvori sajt u Safari browseru, pritisni Share i izaberi Add to Home Screen.';
+    }
+
+    if (!this.isSecure()) {
+      return 'Instalacija radi samo preko HTTPS adrese.';
+    }
+
+    return 'Otvori sajt u Chrome/Edge browseru i sacekaj da browser pripremi instalaciju.';
   }
 
   dismissPrompt(): void {
@@ -78,5 +106,17 @@ export class PwaInstallService {
     }
 
     return choice.outcome === 'accepted';
+  }
+
+  private detectIosDevice(): boolean {
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    const platform = window.navigator.platform.toLowerCase();
+    const hasTouch = window.navigator.maxTouchPoints > 1;
+
+    return /iphone|ipad|ipod/.test(userAgent) || (platform === 'macintel' && hasTouch);
+  }
+
+  private isIosStandalone(): boolean {
+    return Boolean((window.navigator as Navigator & { standalone?: boolean }).standalone);
   }
 }

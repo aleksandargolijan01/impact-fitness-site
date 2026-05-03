@@ -38,6 +38,8 @@ img:hover {
 @media (max-width: 560px) {
   .gallery-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 26px;
   }
 
   .wide {
@@ -46,5 +48,11 @@ img:hover {
 
   img {
     min-height: 220px;
+  }
+}
+
+@media (max-width: 390px) {
+  img {
+    min-height: 190px;
   }
 }

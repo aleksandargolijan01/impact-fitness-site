@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { PwaInstallService } from '../../services/pwa-install.service';
+import { ScrollService } from '../../services/scroll.service';
 
 @Component({
   selector: 'app-footer',
@@ -10,6 +11,7 @@ import { PwaInstallService } from '../../services/pwa-install.service';
 })
 export class Footer {
   readonly pwaInstall = inject(PwaInstallService);
+  readonly scrollService = inject(ScrollService);
   readonly installMessage = signal('');
 
   async installApp(): Promise<void> {
@@ -21,7 +23,7 @@ export class Footer {
     }
 
     if (!this.pwaInstall.canInstall()) {
-      this.installMessage.set('Instalacija trenutno nije dostupna na ovom uredjaju/browseru.');
+      this.installMessage.set(this.pwaInstall.installUnavailableMessage());
       return;
     }
 

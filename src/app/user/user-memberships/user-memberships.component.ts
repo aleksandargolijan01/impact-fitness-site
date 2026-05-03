@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { MembershipApplication } from '../../models/membership-application.model';
 import { AuthService } from '../../services/auth.service';
 import { MembershipApplicationService } from '../../services/membership-application.service';
+import { ScrollService } from '../../services/scroll.service';
 
 type MembershipDisplayStatus = 'active' | 'expiring' | 'expired';
 
@@ -75,8 +76,8 @@ interface MembershipViewModel {
             </tbody>
           </table>
         </div>
-        <a class="btn btn--primary" href="/#pricing">Pogledaj pakete</a>
-        <a class="btn btn--ghost" href="/#pricing">Produzi clanarinu</a>
+        <a class="btn btn--primary" href="/#pricing" (click)="scrollService.goToSection('pricing', $event)">Pogledaj pakete</a>
+        <a class="btn btn--ghost" href="/#pricing" (click)="scrollService.goToSection('pricing', $event)">Produzi clanarinu</a>
       </section>
     </div>
   `,
@@ -85,6 +86,7 @@ interface MembershipViewModel {
 export class UserMembershipsComponent {
   readonly authService = inject(AuthService);
   readonly membershipService = inject(MembershipApplicationService);
+  readonly scrollService = inject(ScrollService);
 
   readonly myApplications = computed(() => {
     const user = this.authService.currentUser();

@@ -3,6 +3,7 @@
   grid-template-columns: minmax(0, 0.85fr) minmax(320px, 1.15fr);
   gap: 46px;
   align-items: center;
+  min-width: 0;
 }
 
 .contact-list {
@@ -55,5 +56,28 @@ iframe {
 @media (max-width: 900px) {
   .contact-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .contact-grid {
+    gap: 28px;
+  }
+
+  .contact-list {
+    gap: 12px;
+    margin: 22px 0;
+  }
+
+  .contact-actions .btn {
+    width: 100%;
+  }
+
+  .map-wrap {
+    min-height: 300px;
+  }
+
+  iframe {
+    height: 300px;
   }
 }

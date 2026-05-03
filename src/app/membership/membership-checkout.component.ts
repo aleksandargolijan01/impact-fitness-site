@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { MembershipApplicationService } from '../services/membership-application.service';
 import { PricingService } from '../services/pricing.service';
+import { ScrollService } from '../services/scroll.service';
 
 @Component({
   selector: 'app-membership-checkout',
@@ -45,7 +46,7 @@ import { PricingService } from '../services/pricing.service';
         <button class="btn btn--primary" type="submit" [disabled]="isSaving || !selectedPackage()">
           {{ isSaving ? 'Slanje...' : 'Posalji prijavu' }}
         </button>
-        <a class="btn btn--ghost" href="/#pricing">Nazad na cenovnik</a>
+        <a class="btn btn--ghost" href="/#pricing" (click)="scrollService.goToSection('pricing', $event)">Nazad na cenovnik</a>
       </form>
     </main>
   `,
@@ -58,6 +59,7 @@ export class MembershipCheckoutComponent {
   private readonly authService = inject(AuthService);
   private readonly pricingService = inject(PricingService);
   private readonly membershipService = inject(MembershipApplicationService);
+  readonly scrollService = inject(ScrollService);
 
   readonly packageId = this.route.snapshot.paramMap.get('packageId') ?? '';
   readonly selectedPackage = computed(() =>

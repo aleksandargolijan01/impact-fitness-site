@@ -72,3 +72,28 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 480px) {
+  .service-grid {
+    gap: 12px;
+    margin-top: 26px;
+  }
+
+  .service-grid article {
+    min-height: 0;
+    padding: 18px;
+  }
+
+  .service-grid h3 {
+    margin-top: 24px;
+    font-size: 1.2rem;
+  }
+
+  .service-grid small {
+    padding-top: 14px;
+  }
+
+  .service-cta .btn {
+    width: 100%;
+  }
+}

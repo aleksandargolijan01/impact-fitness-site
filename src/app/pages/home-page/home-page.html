@@ -141,12 +141,17 @@
           <strong>Jasna struktura</strong>
           <p>Znas tacno sta radis na svakom treningu i kako se taj trening uklapa u cilj.</p>
         </article>
-        <a class="btn btn--primary" href="#booking">Zakazi probni trening</a>
+        <a
+          class="btn btn--primary"
+          href="#booking-form"
+          (click)="scrollService.goToSection('booking-form', $event)"
+          >Zakazi probni trening</a
+        >
       </div>
     </div>
   </section>
 
-  <section class="section faq">
+  <section class="section faq" id="faq">
     <div class="container results-grid">
       <div>
         <p class="section-kicker">FAQ</p>
@@ -210,7 +215,12 @@
             tebe.
           </p>
         </article>
-        <a class="btn btn--primary" href="#booking">Zakazi probni trening danas</a>
+        <a
+          class="btn btn--primary"
+          href="#booking-form"
+          (click)="scrollService.goToSection('booking-form', $event)"
+          >Zakazi probni trening danas</a
+        >
       </div>
     </div>
   </section>

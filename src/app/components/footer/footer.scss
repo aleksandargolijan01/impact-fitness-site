@@ -96,4 +96,25 @@ a:hover::after {
     align-items: flex-start;
     flex-direction: column;
   }
+
+  .footer-links,
+  .footer-install {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .site-footer {
+    padding: 28px 14px;
+  }
+
+  .footer-install button {
+    width: 100%;
+    min-height: 46px;
+  }
+
+  .footer-links {
+    display: grid;
+    gap: 12px;
+  }
 }

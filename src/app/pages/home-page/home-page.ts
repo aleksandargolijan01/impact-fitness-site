@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, afterNextRender, inject, signal } from '@angular/core';
 import { About } from '../../components/about/about';
 import { BookingFormComponent } from '../../components/booking-form/booking-form';
 import { Contact } from '../../components/contact/contact';
@@ -9,6 +9,7 @@ import { Hero } from '../../components/hero/hero';
 import { Pricing } from '../../components/pricing/pricing';
 import { Services } from '../../components/services/services';
 import { Trainers } from '../../components/trainers/trainers';
+import { ScrollService } from '../../services/scroll.service';
 
 @Component({
   selector: 'app-home-page',
@@ -30,7 +31,14 @@ import { Trainers } from '../../components/trainers/trainers';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomePage {
+  readonly scrollService = inject(ScrollService);
   readonly openFaqIndex = signal<number | null>(null);
+
+  constructor() {
+    afterNextRender(() => {
+      queueMicrotask(() => this.scrollService.scrollToInitialHash());
+    });
+  }
 
   toggleFaq(index: number): void {
     this.openFaqIndex.update((current) => (current === index ? null : index));

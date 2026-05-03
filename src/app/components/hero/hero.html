@@ -1,4 +1,4 @@
-<section class="hero" id="hero">
+<section class="hero" id="home">
   <div class="hero-overlay"></div>
   <div class="container hero-grid">
     <div class="hero-copy">
@@ -9,8 +9,18 @@
         jasnu strukturu da brze vidis promenu u snazi, kondiciji i izgledu.
       </p>
       <div class="hero-actions">
-        <a class="btn btn--primary" href="#booking">Zakazi probni trening</a>
-        <a class="btn btn--ghost" href="#services">Pogledaj programe</a>
+        <a
+          class="btn btn--primary"
+          href="#booking-form"
+          (click)="scrollService.goToSection('booking-form', $event)"
+          >Zakazi probni trening</a
+        >
+        <a
+          class="btn btn--ghost"
+          href="#trainings"
+          (click)="scrollService.goToSection('trainings', $event)"
+          >Pogledaj programe</a
+        >
       </div>
 
       <div class="hero-proof" aria-label="Kljucne prednosti">
@@ -27,7 +37,7 @@
       <div class="panel-divider"></div>
       <strong>{{ contentService.schedule().weekendHours }}</strong>
       <p>{{ contentService.schedule().weekendLabel }}</p>
-      <a href="#contact">Pogledaj lokaciju</a>
+      <a href="#contact" (click)="scrollService.goToSection('contact', $event)">Pogledaj lokaciju</a>
     </div>
   </div>
 </section>

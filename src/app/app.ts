@@ -13,16 +13,19 @@ import {
 } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { PwaInstallComponent } from './components/pwa-install/pwa-install.component';
+import { ScrollToTopComponent } from './components/scroll-to-top/scroll-to-top.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, PwaInstallComponent],
+  imports: [RouterOutlet, PwaInstallComponent, ScrollToTopComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class App implements OnInit, AfterViewInit, OnDestroy {
   private revealObserver?: IntersectionObserver;
+  private removeOnlineListener?: () => void;
+  private removeOfflineListener?: () => void;
   private readonly host = inject(ElementRef<HTMLElement>);
   private readonly platformId = inject(PLATFORM_ID);
   private readonly renderer = inject(Renderer2);
@@ -38,6 +41,8 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
     updateOnlineStatus();
     window.addEventListener('online', updateOnlineStatus);
     window.addEventListener('offline', updateOnlineStatus);
+    this.removeOnlineListener = () => window.removeEventListener('online', updateOnlineStatus);
+    this.removeOfflineListener = () => window.removeEventListener('offline', updateOnlineStatus);
   }
 
   ngAfterViewInit(): void {
@@ -90,5 +95,7 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.revealObserver?.disconnect();
+    this.removeOnlineListener?.();
+    this.removeOfflineListener?.();
   }
 }

@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ContentService } from '../../services/content.service';
+import { ScrollService } from '../../services/scroll.service';
 
 @Component({
   selector: 'app-contact',
@@ -10,4 +11,5 @@ import { ContentService } from '../../services/content.service';
 })
 export class Contact {
   readonly contentService = inject(ContentService);
+  readonly scrollService = inject(ScrollService);
 }
