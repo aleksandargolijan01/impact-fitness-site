@@ -1,0 +1,111 @@
+<main class="admin-shell">
+  <header class="admin-header">
+    <div>
+      <p class="section-kicker">Admin</p>
+      <h1>Impact Fitness sadržaj</h1>
+    </div>
+    <a class="btn btn--ghost" routerLink="/">Nazad na sajt</a>
+  </header>
+
+  <section class="admin-section card">
+    <div>
+      <p class="section-kicker">Cenovnik</p>
+      <h2>Izmena paketa</h2>
+    </div>
+
+    <div class="admin-grid">
+      @for (plan of contentService.pricing(); track plan.id) {
+        <form
+          class="admin-card"
+          (submit)="
+            savePricingPlan(
+              plan.id,
+              planName.value,
+              planPrice.value,
+              planPeriod.value,
+              planFeatures.value
+            );
+            $event.preventDefault()
+          "
+        >
+          <label>
+            Naziv
+            <input #planName [value]="plan.name" required />
+          </label>
+          <label>
+            Cena
+            <input #planPrice [value]="plan.price" required />
+          </label>
+          <label>
+            Period
+            <input #planPeriod [value]="plan.period" required />
+          </label>
+          <label>
+            Stavke paketa
+            <textarea #planFeatures rows="5">{{ plan.benefits.join('\n') }}</textarea>
+          </label>
+          <button class="btn btn--primary" type="submit">Sačuvaj</button>
+        </form>
+      }
+    </div>
+  </section>
+
+  <section class="admin-section card">
+    <div>
+      <p class="section-kicker">Treneri</p>
+      <h2>Dodavanje trenera</h2>
+    </div>
+
+    <form class="admin-form" [formGroup]="trainerForm" (ngSubmit)="addTrainer()">
+      <label>
+        Ime
+        <input formControlName="name" placeholder="Ime trenera" />
+      </label>
+      <label>
+        Specijalnost
+        <input formControlName="specialty" placeholder="Npr. Funkcionalni trening" />
+      </label>
+      <label>
+        URL slike
+        <input formControlName="imageUrl" placeholder="https://..." />
+      </label>
+      <label>
+        Alt tekst
+        <input formControlName="alt" />
+      </label>
+      <button class="btn btn--primary" type="submit">Dodaj trenera</button>
+    </form>
+  </section>
+
+  <section class="admin-section card">
+    <div>
+      <p class="section-kicker">Raspored</p>
+      <h2>Radno vreme</h2>
+    </div>
+
+    <form class="admin-form" [formGroup]="scheduleForm" (ngSubmit)="saveSchedule()">
+      <label>
+        Oznaka radnim danima
+        <input formControlName="weekdayLabel" />
+      </label>
+      <label>
+        Radnim danima
+        <input formControlName="weekdayHours" />
+      </label>
+      <label>
+        Oznaka vikendom
+        <input formControlName="weekendLabel" />
+      </label>
+      <label>
+        Vikendom
+        <input formControlName="weekendHours" />
+      </label>
+      <div class="admin-actions">
+        <button class="btn btn--primary" type="submit">Sačuvaj raspored</button>
+        <button class="btn btn--ghost" type="button" (click)="resetContent()">
+          Vrati podrazumevano
+        </button>
+      </div>
+    </form>
+  </section>
+</main>

@@ -1,0 +1,69 @@
+<header class="site-header" [class.is-scrolled]="isScrolled()" [class.menu-open]="isMenuOpen()">
+  <a
+    class="brand"
+    href="#hero"
+    aria-label="Impact Fitness pocetna"
+    (click)="scrollToSection('hero', $event)"
+  >
+    <span class="brand-mark">IF</span>
+    <span>Impact Fitness</span>
+  </a>
+
+  <button
+    class="nav-toggle"
+    type="button"
+    [class.is-open]="isMenuOpen()"
+    [attr.aria-expanded]="isMenuOpen()"
+    aria-label="Otvori navigaciju"
+    aria-controls="main-navigation"
+    (click)="toggleMenu()"
+  >
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <div class="nav-overlay" [class.is-visible]="isMenuOpen()" (click)="closeMenu()"></div>
+
+  <nav
+    id="main-navigation"
+    class="nav"
+    [class.is-open]="isMenuOpen()"
+    aria-label="Glavna navigacija"
+  >
+    @for (item of navItems; track item.id) {
+      <a
+        [href]="'#' + item.id"
+        [class.active]="activeSection() === item.id"
+        (click)="scrollToSection(item.id, $event)"
+      >
+        {{ item.label }}
+      </a>
+    }
+  </nav>
+
+  <div class="header-actions">
+    @if (!authService.isLoggedIn()) {
+      <a class="header-link" routerLink="/login" (click)="closeMenu()">Login</a>
+    } @else if (authService.isAdmin()) {
+      <a class="header-link" routerLink="/admin/dashboard" (click)="closeMenu()">Admin panel</a>
+      <button class="header-link header-link--button" type="button" (click)="logout()">
+        Logout
+      </button>
+    } @else {
+      <a class="header-link" routerLink="/user/dashboard" (click)="closeMenu()">Moj profil</a>
+      <button class="header-link header-link--button" type="button" (click)="logout()">
+        Logout
+      </button>
+    }
+
+    <a
+      class="header-cta"
+      href="#booking"
+      [class.active]="activeSection() === 'booking'"
+      (click)="scrollToSection('booking', $event)"
+    >
+      Zakazi trening
+    </a>
+  </div>
+</header>

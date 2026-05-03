@@ -1,0 +1,26 @@
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <strong>Impact Fitness</strong>
+      <p>Ozbiljan trening. Jasna podrska. Lokalni gym koji drzi standard.</p>
+      <div class="footer-install">
+        @if (pwaInstall.isInstalled()) {
+          <span>Aplikacija je vec instalirana.</span>
+        } @else {
+          <button type="button" (click)="installApp()">Instaliraj Impact aplikaciju</button>
+        }
+
+        @if (installMessage()) {
+          <span role="status">{{ installMessage() }}</span>
+        }
+      </div>
+    </div>
+    <div class="footer-links">
+      <a href="#hero">Pocetna</a>
+      <a href="#services">Treninzi</a>
+      <a href="#pricing">Cenovnik</a>
+      <a href="#booking">Probni trening</a>
+      <a href="#contact">Kontakt</a>
+    </div>
+  </div>
+</footer>

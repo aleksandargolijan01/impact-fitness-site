@@ -1,0 +1,18 @@
+<section class="section" id="gallery">
+  <div class="container">
+    <p class="section-kicker">Galerija</p>
+    <h2 class="section-title">Prostor napravljen za fokus, tempo i dobar trening.</h2>
+
+    <div class="gallery-grid">
+      @for (item of galleryService.items(); track item.id) {
+        <img
+          [class.wide]="item.wide"
+          [src]="item.imageUrl"
+          [alt]="item.altText"
+          loading="lazy"
+          decoding="async"
+        />
+      }
+    </div>
+  </div>
+</section>

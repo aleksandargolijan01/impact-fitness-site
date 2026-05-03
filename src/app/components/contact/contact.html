@@ -1,0 +1,35 @@
+<section class="section" id="contact">
+  <div class="container contact-grid">
+    <div>
+      <p class="section-kicker">Kontakt</p>
+      <h2 class="section-title">Vidimo se u Vojvode Vlahovica 60.</h2>
+      <div class="contact-list">
+        <p><strong>Lokacija:</strong> Vojvode Vlahovica 60, Beograd</p>
+        <p><strong>Telefon:</strong> +381 60 000 0000</p>
+        <p><strong>Email:</strong> impactfitness@example.com</p>
+        <p>
+          <strong>Radno vreme:</strong>
+          {{ contentService.schedule().weekdayLabel }} {{ contentService.schedule().weekdayHours }}
+        </p>
+        <p>
+          <strong>Vikend:</strong>
+          {{ contentService.schedule().weekendLabel }} {{ contentService.schedule().weekendHours }}
+        </p>
+      </div>
+      <div class="contact-actions">
+        <a class="btn btn--primary" href="#booking">Zakazi probni trening</a>
+        <a class="btn btn--ghost" href="tel:+381600000000">Pozovi gym</a>
+      </div>
+    </div>
+
+    <div class="map-wrap card">
+      <iframe
+        title="Impact Fitness lokacija na Google mapi"
+        src="https://www.google.com/maps?q=Vojvode%20Vlahovica%2060%2C%20Beograd&output=embed"
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+      >
+      </iframe>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,125 @@
+<section class="section section--alt" id="booking">
+  <div class="container booking-grid">
+    <div class="booking-copy">
+      <p class="section-kicker">Probni trening</p>
+      <h2 class="section-title">Prvi dolazak ne treba da bude nasumican.</h2>
+      <p class="section-copy">
+        Popuni formu, izaberi cilj i trenera. Tim dobija zahtev, proverava najbolji termin i javlja
+        ti se sa konkretnim predlogom.
+      </p>
+      <div class="booking-steps">
+        <span>1. Procena cilja i trenutnog nivoa</span>
+        <span>2. Predlog treninga ili paketa</span>
+        <span>3. Jasna sledeca akcija posle prvog dolaska</span>
+      </div>
+    </div>
+
+    <form
+      class="card booking-form"
+      [formGroup]="bookingForm"
+      (ngSubmit)="submit()"
+      [attr.aria-busy]="isSending"
+      novalidate
+    >
+      <input
+        class="honeypot"
+        type="text"
+        formControlName="website"
+        tabindex="-1"
+        autocomplete="off"
+        aria-hidden="true"
+      />
+
+      @if (successMessageVisible) {
+        <div class="success" role="status">
+          Uspesno poslato. Javicemo se uskoro da potvrdimo termin.
+        </div>
+      }
+
+      @if (errorMessage) {
+        <div class="error" role="alert">
+          {{ errorMessage }}
+        </div>
+      }
+
+      <label>
+        Ime i prezime
+        <input type="text" formControlName="fullName" placeholder="Unesi ime i prezime" />
+        @if (hasError('fullName')) {
+          <span>Ime i prezime je obavezno.</span>
+        }
+      </label>
+
+      <div class="form-row">
+        <label>
+          Telefon
+          <input type="tel" formControlName="phone" placeholder="+381 6x xxx xxxx" />
+          @if (hasError('phone')) {
+            <span>Unesi ispravan broj telefona.</span>
+          }
+        </label>
+
+        <label>
+          Email
+          <input type="email" formControlName="email" placeholder="ime@email.com" />
+          @if (hasError('email')) {
+            <span>Unesi ispravan email.</span>
+          }
+        </label>
+      </div>
+
+      <div class="form-row">
+        <label>
+          Cilj treninga
+          <select formControlName="goal">
+            <option value="">Izaberi cilj</option>
+            <option>Mrsavljenje</option>
+            <option>Misicna masa</option>
+            <option>Kondicija</option>
+            <option>Bolja tehnika</option>
+          </select>
+          @if (hasError('goal')) {
+            <span>Cilj treninga je obavezan.</span>
+          }
+        </label>
+
+        <label>
+          Izaberi trenera
+          <select formControlName="trainerId">
+            <option value="">Izaberi trenera</option>
+            <option value="no-preference">Nije bitno - predlozite mi trenera</option>
+            @if (trainerService.trainers().length) {
+              @for (trainer of trainerService.trainers(); track trainer.id) {
+                <option [value]="trainer.id">{{ trainer.name }}</option>
+              }
+            } @else {
+              <option value="assign-trainer">Dodeli trenera po izboru</option>
+            }
+          </select>
+          @if (hasError('trainerId')) {
+            <span>Trener je obavezan.</span>
+          }
+        </label>
+      </div>
+
+      <label>
+        Poruka
+        <textarea
+          formControlName="message"
+          maxlength="800"
+          rows="5"
+          placeholder="Napisi zeljeni termin ili dodatne informacije"
+        ></textarea>
+      </label>
+
+      <button class="btn btn--primary" type="submit" [disabled]="isSending">
+        @if (isSending) {
+          <span class="spinner" aria-hidden="true"></span>
+          Slanje...
+        } @else {
+          Posalji zahtev
+        }
+      </button>
+    </form>
+  </div>
+</section>

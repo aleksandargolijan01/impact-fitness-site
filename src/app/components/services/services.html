@@ -1,0 +1,27 @@
+<section class="section section--alt" id="services">
+  <div class="container">
+    <p class="section-kicker">Usluge i treninzi</p>
+    <h2 class="section-title">Treniraj u grupi. Napreduj brze.</h2>
+    <p class="section-copy">
+      Strukturirani grupni treninzi u sali uz vodjenje trenera i energiju grupe.
+    </p>
+    <p class="section-copy">Trener vodi trening / Fiksni termini / Energija grupe</p>
+
+    <div class="service-grid">
+      @for (service of gymService.services(); track service.id; let index = $index) {
+        <article class="card">
+          <span>{{ (index + 1).toString().padStart(2, '0') }}</span>
+          <h3>{{ service.title }}</h3>
+          <p>Grupni trening u sali: {{ service.description }}</p>
+          <small>{{ service.duration }} / {{ service.level }}</small>
+        </article>
+      }
+      <article class="card service-cta">
+        <span>?</span>
+        <h3>Raspored treninga</h3>
+        <p>Pogledaj termine svih grupnih treninga i pronadji ono sto ti odgovara.</p>
+        <a class="btn btn--primary" href="#schedule">Vidi raspored</a>
+      </article>
+    </div>
+  </div>
+</section>

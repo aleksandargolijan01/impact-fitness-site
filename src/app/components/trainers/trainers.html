@@ -1,0 +1,18 @@
+<section class="section section--alt" id="trainers">
+  <div class="container">
+    <p class="section-kicker">Treneri</p>
+    <h2 class="section-title">Tim koji spaja znanje, energiju i realan pristup.</h2>
+
+    <div class="trainer-grid">
+      @for (trainer of contentService.trainers(); track trainer.id) {
+        <article class="card">
+          <img [src]="trainer.imageUrl" [alt]="trainer.alt" loading="lazy" decoding="async" />
+          <div>
+            <h3>{{ trainer.name }}</h3>
+            <p>{{ trainer.specialty }}</p>
+          </div>
+        </article>
+      }
+    </div>
+  </div>
+</section>

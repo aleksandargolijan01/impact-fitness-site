@@ -1,0 +1,102 @@
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-top: 36px;
+}
+
+.pricing-grid article {
+  position: relative;
+  padding: 28px;
+}
+
+.pricing-grid h3 {
+  margin: 0 0 18px;
+  font-size: 1.5rem;
+}
+
+.price {
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  font-weight: 900;
+  line-height: 1;
+  transition:
+    color 220ms ease,
+    transform 220ms var(--ease-spring);
+}
+
+.pricing-grid article:hover .price {
+  color: var(--accent-strong);
+  transform: translateY(-2px);
+}
+
+.pricing-grid span {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted);
+}
+
+ul {
+  display: grid;
+  gap: 10px;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+  color: #d7d9de;
+}
+
+li::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.pricing-grid .btn {
+  width: 100%;
+  margin-top: 26px;
+}
+
+.featured {
+  border-color: rgba(255, 51, 72, 0.55);
+  box-shadow: 0 24px 70px rgba(226, 29, 47, 0.18);
+  transform: translateY(-8px);
+}
+
+.featured:hover {
+  transform: translateY(-12px);
+}
+
+.badge {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(226, 29, 47, 0.16);
+  color: var(--accent-strong);
+  font-size: 0.75rem;
+  font-weight: 900;
+  animation: badgePulse 2.4s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(226, 29, 47, 0);
+  }
+
+  50% {
+    box-shadow: 0 0 0 8px rgba(226, 29, 47, 0.1);
+  }
+}
+
+@media (max-width: 900px) {
+  .pricing-grid {
+    grid-template-columns: 1fr;
+  }
+}

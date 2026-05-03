@@ -1,0 +1,33 @@
+<section class="hero" id="hero">
+  <div class="hero-overlay"></div>
+  <div class="container hero-grid">
+    <div class="hero-copy">
+      <p class="section-kicker">Vojvode Vlahovica 60, Beograd</p>
+      <h1>Dodji do rezultata uz trening koji ima plan.</h1>
+      <p>
+        Trener te vodi od prvog dolaska, program se prilagodjava tvom cilju, a svaki trening ima
+        jasnu strukturu da brze vidis promenu u snazi, kondiciji i izgledu.
+      </p>
+      <div class="hero-actions">
+        <a class="btn btn--primary" href="#booking">Zakazi probni trening</a>
+        <a class="btn btn--ghost" href="#services">Pogledaj programe</a>
+      </div>
+
+      <div class="hero-proof" aria-label="Kljucne prednosti">
+        <span>500+ aktivnih clanova</span>
+        <span>7 dana u nedelji</span>
+        <span>Plan od prvog dolaska</span>
+      </div>
+    </div>
+
+    <div class="hero-panel card" aria-label="Radno vreme i kljucne informacije">
+      <span class="panel-label">Otvoreno svaki dan</span>
+      <strong>{{ contentService.schedule().weekdayHours }}</strong>
+      <p>{{ contentService.schedule().weekdayLabel }}</p>
+      <div class="panel-divider"></div>
+      <strong>{{ contentService.schedule().weekendHours }}</strong>
+      <p>{{ contentService.schedule().weekendLabel }}</p>
+      <a href="#contact">Pogledaj lokaciju</a>
+    </div>
+  </div>
+</section>
