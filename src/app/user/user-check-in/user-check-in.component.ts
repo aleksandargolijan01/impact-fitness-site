@@ -10,7 +10,6 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import jsQR from 'jsqr';
 import { AuthService } from '../../services/auth.service';
 import { CheckInService, VALID_CHECK_IN_QR_CODE } from '../../services/check-in.service';
@@ -19,7 +18,7 @@ import { RouterLink } from '@angular/router';
 @Component({
   selector: 'app-user-check-in',
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [RouterLink],
   template: `
     <div class="panel-page">
       <div class="panel-heading">
@@ -78,23 +77,12 @@ import { RouterLink } from '@angular/router';
               </button>
             }
           </div>
-
-          <label>
-            Test unos QR koda
-            <input
-              [(ngModel)]="manualQrCode"
-              name="manualQrCode"
-              placeholder="IMPACT_GYM_CHECKIN"
-            />
-          </label>
-          <button class="btn btn--ghost" type="button" (click)="submitManualQrCode()">
-            Testiraj QR kod
-          </button>
         </section>
       }
 
       <section class="card panel-card">
         <h2>Moja istorija dolazaka</h2>
+        @let checkIns = myCheckIns();
         <div class="table-wrap">
           <table>
             <thead>
@@ -110,9 +98,9 @@ import { RouterLink } from '@angular/router';
                   <td colspan="3"><span class="skeleton-line"></span></td>
                 </tr>
               } @else {
-                @for (checkIn of myCheckIns(); track checkIn.id; let index = $index) {
+                @for (checkIn of checkIns; track checkIn.id; let index = $index) {
                   <tr>
-                    <td data-label="#">#{{ myCheckIns().length - index }}</td>
+                    <td data-label="#">#{{ checkIns.length - index }}</td>
                     <td data-label="Datum">{{ formatDate(checkIn.date) }}</td>
                     <td data-label="Vreme">{{ checkIn.time }}</td>
                   </tr>
@@ -146,7 +134,6 @@ export class UserCheckInComponent implements OnDestroy {
   readonly successTotalCount = signal(0);
   readonly successMessage = signal('');
   readonly errorMessage = signal('');
-  manualQrCode = '';
 
   readonly myCheckIns = computed(() => {
     const userId = this.authService.currentUser()?.id;
@@ -233,8 +220,6 @@ export class UserCheckInComponent implements OnDestroy {
     const user = this.authService.currentUser();
     const scannedValue = value.trim();
 
-    console.log('QR value:', scannedValue);
-
     if (!user) {
       this.stopScanner();
       this.errorMessage.set('Morate biti ulogovani za cekiranje.');
@@ -250,7 +235,6 @@ export class UserCheckInComponent implements OnDestroy {
     this.isSavingScan = true;
 
     try {
-      console.log('Creating check-in for user:', user.id);
       await this.checkInService.createCheckIn({
         userId: user.id,
         fullName: user.fullName,
@@ -272,10 +256,6 @@ export class UserCheckInComponent implements OnDestroy {
           : 'Cekiranje trenutno nije sacuvano. Proverite vezu i pokusajte ponovo.',
       );
     }
-  }
-
-  async submitManualQrCode(): Promise<void> {
-    await this.handleScan(this.manualQrCode);
   }
 
   private scanFrame(video: HTMLVideoElement): void {

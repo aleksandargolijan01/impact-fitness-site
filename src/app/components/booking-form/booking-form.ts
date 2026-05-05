@@ -114,8 +114,7 @@ export class BookingFormComponent {
       this.bookingForm.reset();
       this.prefilledUserId = '';
       this.prefillFromCurrentUser();
-    } catch (error) {
-      console.error('Creating public booking failed', error);
+    } catch {
       this.errorMessage = 'Slanje trenutno nije uspelo. Proveri internet vezu i pokusaj ponovo.';
     } finally {
       this.isSending = false;

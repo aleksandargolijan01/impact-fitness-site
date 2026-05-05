@@ -2,7 +2,7 @@ import { isPlatformBrowser } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
-  HostListener,
+  NgZone,
   OnDestroy,
   afterNextRender,
   inject,
@@ -32,7 +32,9 @@ export class Header implements OnDestroy {
   private readonly router = inject(Router);
   private readonly document = inject(DOCUMENT);
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly ngZone = inject(NgZone);
   private observer?: IntersectionObserver;
+  private removeScrollListener?: () => void;
 
   readonly navItems: NavItem[] = [
     { id: 'about', label: 'O nama' },
@@ -55,17 +57,14 @@ export class Header implements OnDestroy {
 
     afterNextRender(() => {
       this.updateScrolledState();
+      this.setupScrollListener();
       this.observeSections();
     });
   }
 
   ngOnDestroy(): void {
     this.observer?.disconnect();
-  }
-
-  @HostListener('window:scroll')
-  onWindowScroll(): void {
-    this.updateScrolledState();
+    this.removeScrollListener?.();
   }
 
   toggleMenu(): void {
@@ -90,7 +89,20 @@ export class Header implements OnDestroy {
   }
 
   private updateScrolledState(): void {
-    this.isScrolled.set(globalThis.scrollY > 8);
+    const nextState = globalThis.scrollY > 8;
+
+    if (this.isScrolled() !== nextState) {
+      this.ngZone.run(() => this.isScrolled.set(nextState));
+    }
+  }
+
+  private setupScrollListener(): void {
+    this.ngZone.runOutsideAngular(() => {
+      const onScroll = () => this.updateScrolledState();
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      this.removeScrollListener = () => window.removeEventListener('scroll', onScroll);
+    });
   }
 
   private observeSections(): void {

@@ -74,7 +74,7 @@ import { TrainerService } from '../../services/trainer.service';
                     <td data-label="Vreme">{{ booking.preferredTime }}</td>
                     <td data-label="Cilj">{{ booking.goal }}</td>
                     <td data-label="Status">{{ booking.status }}</td>
-                    <td data-label="Akcije">
+                    <td class="row-actions" data-label="Akcije">
                       @if (booking.status !== 'otkazano') {
                         <button class="btn btn--ghost" type="button" (click)="cancel(booking.id)">
                           Otkazi

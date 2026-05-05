@@ -9,13 +9,34 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { MembershipApplication } from '../../models/membership-application.model';
+import {
+  MembershipApplication,
+  getMembershipStatusClass,
+  getMembershipStatusLabel,
+  normalizeMembershipStatus,
+} from '../../models/membership-application.model';
 import { AuthService } from '../../services/auth.service';
 import { CheckInService } from '../../services/check-in.service';
 import { MembershipApplicationService } from '../../services/membership-application.service';
 import { NotificationService } from '../../services/notification.service';
 import { ScrollService } from '../../services/scroll.service';
 import { UserGoalService } from '../../services/user-goal.service';
+
+interface AchievementBadge {
+  id: string;
+  target: number;
+  title: string;
+  description: string;
+  icon: string;
+}
+
+interface AchievementBadgeView extends AchievementBadge {
+  progress: number;
+  progressText: string;
+  percent: number;
+  ringOffset: number;
+  completed: boolean;
+}
 
 @Component({
   selector: 'app-user-progress',
@@ -57,17 +78,52 @@ import { UserGoalService } from '../../services/user-goal.service';
             <span [style.width.%]="goalProgress()"></span>
           </div>
           <p>{{ goalProgressText() }}</p>
-          <label>
-            Izaberi cilj
-            <select [ngModel]="selectedGoal()" (ngModelChange)="selectedGoal.set($event)">
-              <option [ngValue]="8">8 dolazaka</option>
-              <option [ngValue]="12">12 dolazaka</option>
-              <option [ngValue]="16">16 dolazaka</option>
-            </select>
-          </label>
-          <button class="btn btn--primary" type="button" (click)="saveGoal()">Sacuvaj cilj</button>
+          <div class="monthly-goal-row">
+            <label class="monthly-goal-field">
+              Izaberi cilj
+              <select [ngModel]="selectedGoal()" (ngModelChange)="selectedGoal.set($event)">
+                <option [ngValue]="8">8 dolazaka</option>
+                <option [ngValue]="12">12 dolazaka</option>
+                <option [ngValue]="16">16 dolazaka</option>
+              </select>
+            </label>
+            <button class="btn btn--primary" type="button" (click)="saveGoal()">Sacuvaj cilj</button>
+          </div>
         </section>
       </div>
+
+      <section class="card panel-card achievements-card">
+        <h2>Dostignuća</h2>
+        <div class="achievement-grid">
+          @for (badge of achievementBadgeViews(); track badge.id) {
+            <article class="achievement-badge" [class.is-complete]="badge.completed">
+              <div
+                class="achievement-ring"
+                [style.--badge-offset]="badge.ringOffset"
+                [attr.aria-label]="badge.progressText"
+              >
+                <svg viewBox="0 0 120 120" aria-hidden="true">
+                  <circle class="achievement-ring__track" cx="60" cy="60" r="52" pathLength="100" />
+                  <circle
+                    class="achievement-ring__progress"
+                    cx="60"
+                    cy="60"
+                    r="52"
+                    pathLength="100"
+                  />
+                </svg>
+                <span class="achievement-ring__icon">{{ badge.icon }}</span>
+                @if (badge.completed) {
+                  <span class="achievement-ring__check">✓</span>
+                }
+              </div>
+              <h3>{{ badge.title }}</h3>
+              <p>{{ badge.description }}</p>
+              <strong>{{ badge.progressText }}</strong>
+            </article>
+          }
+        </div>
+      </section>
 
       <section class="card panel-card">
         <h2>Status clanarine</h2>
@@ -137,6 +193,37 @@ export class UserProgressComponent {
   private readonly goalService = inject(UserGoalService);
   private readonly membershipService = inject(MembershipApplicationService);
 
+  private readonly badges: AchievementBadge[] = [
+    {
+      id: 'first',
+      target: 1,
+      title: 'Prvi korak',
+      description: 'Napravio si prvi korak',
+      icon: '🎯',
+    },
+    {
+      id: 'five',
+      target: 5,
+      title: 'Uhvatio ritam',
+      description: 'Ulaziš u ritam',
+      icon: '🔥',
+    },
+    {
+      id: 'ten',
+      target: 10,
+      title: 'Nema stajanja',
+      description: 'Nema stajanja',
+      icon: '💪',
+    },
+    {
+      id: 'fifteen',
+      target: 15,
+      title: 'Disciplina',
+      description: 'Disciplina na nivou',
+      icon: '🏆',
+    },
+  ];
+
   readonly selectedGoal = signal(12);
   readonly successMessage = signal('');
   readonly errorMessage = signal('');
@@ -155,6 +242,24 @@ export class UserProgressComponent {
     const userId = this.authService.currentUser()?.id;
 
     return userId ? this.checkInService.getCheckInsByUserId(userId) : [];
+  });
+
+  readonly achievementBadgeViews = computed<AchievementBadgeView[]>(() => {
+    const currentVisits = this.myCheckIns().length;
+
+    return this.badges.map((badge) => {
+      const progress = Math.min(currentVisits, badge.target);
+      const percent = Math.round((progress / badge.target) * 100);
+
+      return {
+        ...badge,
+        progress,
+        progressText: `${progress}/${badge.target}`,
+        percent,
+        ringOffset: 100 - percent,
+        completed: currentVisits >= badge.target,
+      };
+    });
   });
 
   readonly monthlyCheckIns = computed(() => {
@@ -238,23 +343,33 @@ export class UserProgressComponent {
     const startDate = this.parseDate(application.startDate || application.createdAt) ?? new Date();
     const endDate = new Date(startDate);
     endDate.setMonth(endDate.getMonth() + 1);
+    const status = normalizeMembershipStatus(application.status);
     const daysLeft = Math.ceil(
       (this.startOfDay(endDate).getTime() - this.startOfDay(new Date()).getTime()) /
         (1000 * 60 * 60 * 24),
     );
-    const status = daysLeft < 0 ? 'expired' : daysLeft < 5 ? 'expiring' : 'active';
 
     return {
       startDate,
       endDate,
-      statusClass: `status-badge--${status}`,
-      statusLabel:
-        status === 'active' ? 'Aktivna' : status === 'expiring' ? 'Istice uskoro' : 'Istekla',
-      expirationText:
-        daysLeft >= 0
-          ? `Clanarina istice za ${daysLeft} dana.`
-          : `Clanarina je istekla pre ${Math.abs(daysLeft)} dana.`,
+      statusClass: getMembershipStatusClass(application.status),
+      statusLabel: getMembershipStatusLabel(application.status),
+      expirationText: this.getMembershipText(status, daysLeft),
     };
+  }
+
+  private getMembershipText(status: string, daysLeft: number): string {
+    if (status === 'na_cekanju') {
+      return 'Zahtev je u obradi.';
+    }
+
+    if (status === 'blokirano') {
+      return 'Clanarina je blokirana.';
+    }
+
+    return daysLeft >= 0
+      ? `Clanarina istice za ${daysLeft} dana.`
+      : `Clanarina je istekla pre ${Math.abs(daysLeft)} dana.`;
   }
 
   private parseDate(value: string): Date | null {

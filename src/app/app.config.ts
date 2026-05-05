@@ -1,7 +1,18 @@
-import { ApplicationConfig, isDevMode, provideBrowserGlobalErrorListeners } from '@angular/core';
-import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
+import { isPlatformBrowser } from '@angular/common';
+import {
+  ApplicationConfig,
+  PLATFORM_ID,
+  isDevMode,
+  provideBrowserGlobalErrorListeners,
+} from '@angular/core';
+import { FirebaseApp, provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+import {
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+} from 'firebase/firestore';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
@@ -16,10 +27,26 @@ export const appConfig: ApplicationConfig = {
     provideClientHydration(withEventReplay()),
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideAuth(() => getAuth()),
-    provideFirestore(() => getFirestore()),
+    provideFirestore((injector) => {
+      const firebaseApp = injector.get(FirebaseApp);
+
+      if (!isPlatformBrowser(injector.get(PLATFORM_ID))) {
+        return getFirestore(firebaseApp);
+      }
+
+      try {
+        return initializeFirestore(firebaseApp, {
+          localCache: persistentLocalCache({
+            tabManager: persistentMultipleTabManager(),
+          }),
+        });
+      } catch {
+        return getFirestore(firebaseApp);
+      }
+    }),
     provideServiceWorker('ngsw-worker.js', {
-      enabled: !isDevMode(),
-      registrationStrategy: 'registerWhenStable:30000',
+      enabled: environment.production && !isDevMode(),
+      registrationStrategy: 'registerImmediately',
     }),
   ],
 };

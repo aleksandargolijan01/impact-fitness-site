@@ -1,7 +1,12 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { MembershipApplication } from '../../models/membership-application.model';
+import {
+  MembershipApplication,
+  getMembershipStatusClass,
+  getMembershipStatusLabel,
+  normalizeMembershipStatus,
+} from '../../models/membership-application.model';
 import { AuthService } from '../../services/auth.service';
 import { BookingService } from '../../services/booking.service';
 import { CheckInService } from '../../services/check-in.service';
@@ -88,7 +93,7 @@ import { UserGoalService } from '../../services/user-goal.service';
               </tr>
             </thead>
             <tbody>
-              @for (booking of myBookings().slice(0, 5); track booking.id) {
+              @for (booking of latestBookings(); track booking.id) {
                 <tr>
                   <td data-label="Trener">
                     {{ displayTrainer(booking.trainerName, booking.message) }}
@@ -116,7 +121,7 @@ import { UserGoalService } from '../../services/user-goal.service';
         } @else {
           <div class="notification-list">
             @for (
-              notification of notificationService.notifications().slice(0, 4);
+              notification of latestNotifications();
               track notification.id
             ) {
               <article class="notification-item" [class.is-unread]="!notification.read">
@@ -150,6 +155,10 @@ export class UserDashboardComponent {
 
     return this.bookingService.bookings().filter((booking) => booking.userId === userId);
   });
+
+  readonly latestBookings = computed(() => this.myBookings().slice(0, 5));
+
+  readonly latestNotifications = computed(() => this.notificationService.notifications().slice(0, 4));
 
   readonly myCheckIns = computed(() => {
     const userId = this.authService.currentUser()?.id;
@@ -210,23 +219,33 @@ export class UserDashboardComponent {
     const startDate = this.parseDate(application.startDate || application.createdAt) ?? new Date();
     const endDate = new Date(startDate);
     endDate.setMonth(endDate.getMonth() + 1);
+    const status = normalizeMembershipStatus(application.status);
     const daysLeft = Math.ceil(
       (this.startOfDay(endDate).getTime() - this.startOfDay(new Date()).getTime()) /
         (1000 * 60 * 60 * 24),
     );
-    const status = daysLeft < 0 ? 'expired' : daysLeft < 5 ? 'expiring' : 'active';
 
     return {
       startDate,
       endDate,
-      statusClass: `status-badge--${status}`,
-      statusLabel:
-        status === 'active' ? 'Aktivna' : status === 'expiring' ? 'Istice uskoro' : 'Istekla',
-      expirationText:
-        daysLeft >= 0
-          ? `Clanarina istice za ${daysLeft} dana.`
-          : `Clanarina je istekla pre ${Math.abs(daysLeft)} dana.`,
+      statusClass: getMembershipStatusClass(application.status),
+      statusLabel: getMembershipStatusLabel(application.status),
+      expirationText: this.getMembershipText(status, daysLeft),
     };
+  }
+
+  private getMembershipText(status: string, daysLeft: number): string {
+    if (status === 'na_cekanju') {
+      return 'Zahtev je u obradi.';
+    }
+
+    if (status === 'blokirano') {
+      return 'Clanarina je blokirana.';
+    }
+
+    return daysLeft >= 0
+      ? `Clanarina istice za ${daysLeft} dana.`
+      : `Clanarina je istekla pre ${Math.abs(daysLeft)} dana.`;
   }
 
   private parseDate(value: string): Date | null {

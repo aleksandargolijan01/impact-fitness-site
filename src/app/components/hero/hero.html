@@ -1,4 +1,6 @@
 <section class="hero" id="home">
+  @let schedule = contentService.schedule();
+
   <div class="hero-overlay"></div>
   <div class="container hero-grid">
     <div class="hero-copy">
@@ -32,11 +34,11 @@
 
     <div class="hero-panel card" aria-label="Radno vreme i kljucne informacije">
       <span class="panel-label">Otvoreno svaki dan</span>
-      <strong>{{ contentService.schedule().weekdayHours }}</strong>
-      <p>{{ contentService.schedule().weekdayLabel }}</p>
+      <strong>{{ schedule.weekdayHours }}</strong>
+      <p>{{ schedule.weekdayLabel }}</p>
       <div class="panel-divider"></div>
-      <strong>{{ contentService.schedule().weekendHours }}</strong>
-      <p>{{ contentService.schedule().weekendLabel }}</p>
+      <strong>{{ schedule.weekendHours }}</strong>
+      <p>{{ schedule.weekendLabel }}</p>
       <a href="#contact" (click)="scrollService.goToSection('contact', $event)">Pogledaj lokaciju</a>
     </div>
   </div>

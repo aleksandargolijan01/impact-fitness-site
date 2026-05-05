@@ -60,7 +60,6 @@ export class CheckInService {
 
   async createCheckIn(checkIn: CreateCheckInPayload): Promise<CheckIn> {
     const normalizedQrCodeValue = this.normalizeQrCode(checkIn.qrCodeValue);
-    console.log('Creating check-in for user:', checkIn.userId);
 
     if (normalizedQrCodeValue !== VALID_CHECK_IN_QR_CODE) {
       throw new Error('INVALID_QR_CODE');

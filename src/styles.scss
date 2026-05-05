@@ -107,6 +107,7 @@ img {
   font-size: clamp(2rem, 4vw, 3.4rem);
   font-weight: 700;
   line-height: 1.04;
+  overflow-wrap: break-word;
   text-wrap: balance;
   text-transform: uppercase;
 }
@@ -578,20 +579,47 @@ img {
   font-weight: 800;
 }
 
-.check-row {
+.check-row,
+.checkbox-row {
   display: flex !important;
   align-items: center;
-  gap: 10px !important;
+  flex-wrap: nowrap;
+  gap: 12px !important;
+  width: 100%;
+  max-width: 100%;
+  line-height: 1.35;
+  white-space: normal;
+  text-align: left;
+  cursor: pointer;
 }
 
-.check-row input {
-  width: auto;
+.check-row input,
+.checkbox-row input {
+  flex: 0 0 auto;
+  width: 18px;
+  min-width: 18px;
+  height: 18px;
+  min-height: 18px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.checkbox-row span {
+  min-width: 0;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: normal;
+  word-break: normal;
+  line-height: 1.35;
+  writing-mode: horizontal-tb;
 }
 
 .auth-card input,
 .panel-form input,
 .panel-form textarea,
 .panel-form select,
+.check-in-mobile-filters input,
+.check-in-mobile-filters select,
 .panel-toolbar input,
 .panel-toolbar select,
 td select {
@@ -611,6 +639,8 @@ td select {
 .auth-card input,
 .panel-form input,
 .panel-form select,
+.check-in-mobile-filters input,
+.check-in-mobile-filters select,
 .panel-toolbar input,
 .panel-toolbar select,
 td select {
@@ -627,6 +657,8 @@ td select {
 .panel-form input:hover,
 .panel-form textarea:hover,
 .panel-form select:hover,
+.check-in-mobile-filters input:hover,
+.check-in-mobile-filters select:hover,
 .panel-toolbar input:hover,
 .panel-toolbar select:hover,
 td select:hover {
@@ -637,6 +669,8 @@ td select:hover {
 .panel-form input:focus,
 .panel-form textarea:focus,
 .panel-form select:focus,
+.check-in-mobile-filters input:focus,
+.check-in-mobile-filters select:focus,
 .panel-toolbar input:focus,
 .panel-toolbar select:focus,
 td select:focus {
@@ -653,9 +687,280 @@ td select:focus {
   box-shadow: 0 0 0 3px rgba(226, 29, 47, 0.12);
 }
 
+.panel-form .checkbox-row {
+  grid-column: 1 / -1;
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  gap: 12px !important;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  text-align: left;
+  white-space: normal;
+}
+
+.panel-form .checkbox-row input[type='checkbox'] {
+  flex: 0 0 18px;
+  width: 18px;
+  min-width: 18px;
+  max-width: 18px;
+  height: 18px;
+  min-height: 18px;
+  max-height: 18px;
+  margin: 0;
+  padding: 0;
+}
+
+.panel-form .checkbox-row span {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: calc(100% - 30px);
+  overflow: visible;
+  overflow-wrap: normal;
+  word-break: normal;
+  white-space: normal;
+  writing-mode: horizontal-tb;
+}
+
 select option {
   background: #111317;
   color: var(--text);
+}
+
+.monthly-goal-row {
+  display: flex;
+  align-items: end;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.monthly-goal-field {
+  display: grid;
+  flex: 1 1 220px;
+  gap: 8px;
+  min-width: 0;
+  color: #f2f3f5;
+  font-weight: 800;
+}
+
+.monthly-goal-field select {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 42px 0 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  appearance: none;
+  background:
+    linear-gradient(45deg, transparent 50%, var(--accent-strong) 50%) right 16px center / 7px 7px
+      no-repeat,
+    linear-gradient(135deg, var(--accent-strong) 50%, transparent 50%) right 11px center / 7px 7px
+      no-repeat,
+    linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.035)),
+    #111317;
+  color: var(--text);
+  outline: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.monthly-goal-field select:hover {
+  border-color: rgba(255, 51, 72, 0.42);
+  background-color: #151820;
+}
+
+.monthly-goal-field select:focus,
+.monthly-goal-field select:focus-visible {
+  border-color: var(--accent-strong);
+  box-shadow:
+    var(--focus-ring),
+    0 10px 28px rgba(226, 29, 47, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.monthly-goal-field select option {
+  background: #111317;
+  color: var(--text);
+}
+
+.monthly-goal-row .btn {
+  flex: 0 0 auto;
+  min-height: 48px;
+}
+
+.achievements-card {
+  overflow: hidden;
+}
+
+.achievement-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.achievement-badge {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 16px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255, 51, 72, 0.1), transparent 42%),
+    rgba(255, 255, 255, 0.035);
+  text-align: center;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease,
+    background 180ms ease;
+}
+
+.achievement-badge:hover {
+  border-color: rgba(255, 51, 72, 0.34);
+  transform: translateY(-2px);
+}
+
+.achievement-badge.is-complete {
+  border-color: rgba(255, 51, 72, 0.5);
+  background:
+    radial-gradient(circle at 50% 16%, rgba(255, 51, 72, 0.18), transparent 46%),
+    rgba(255, 255, 255, 0.045);
+  box-shadow: 0 16px 36px rgba(226, 29, 47, 0.14);
+  animation: achievement-complete-pop 520ms var(--ease-spring) both;
+}
+
+.achievement-ring {
+  position: relative;
+  display: grid;
+  width: clamp(82px, 22vw, 112px);
+  aspect-ratio: 1;
+  place-items: center;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, #171a20 0 58%, transparent 59%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.015));
+}
+
+.achievement-ring svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform: rotate(-90deg);
+}
+
+.achievement-ring__track,
+.achievement-ring__progress {
+  fill: none;
+  stroke-width: 10;
+}
+
+.achievement-ring__track {
+  stroke: rgba(255, 255, 255, 0.08);
+}
+
+.achievement-ring__progress {
+  stroke: var(--accent-strong);
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: var(--badge-offset);
+  filter: drop-shadow(0 0 8px rgba(255, 51, 72, 0.46));
+  animation: achievement-ring-fill 860ms var(--ease-out) both;
+}
+
+.achievement-ring__icon {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 58%;
+  aspect-ratio: 1;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025));
+  font-size: clamp(1.45rem, 7vw, 2rem);
+  line-height: 1;
+}
+
+.achievement-ring__check {
+  position: absolute;
+  right: 3px;
+  bottom: 8px;
+  z-index: 2;
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 900;
+  box-shadow: 0 8px 20px rgba(226, 29, 47, 0.28);
+}
+
+.achievement-badge h3 {
+  margin: 4px 0 0;
+  color: var(--text);
+  font-size: clamp(0.92rem, 4vw, 1.05rem);
+  line-height: 1.15;
+}
+
+.achievement-badge p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.35;
+}
+
+.achievement-badge strong {
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+@keyframes achievement-ring-fill {
+  from {
+    stroke-dashoffset: 100;
+  }
+
+  to {
+    stroke-dashoffset: var(--badge-offset);
+  }
+}
+
+@keyframes achievement-complete-pop {
+  0% {
+    transform: scale(0.98);
+  }
+
+  70% {
+    transform: scale(1.025);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (min-width: 900px) {
+  .achievement-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 380px) {
+  .achievement-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .field-error {
@@ -748,6 +1053,44 @@ td {
   border-color: rgba(255, 255, 255, 0.16);
   background: rgba(255, 255, 255, 0.06);
   color: #d7d9de;
+}
+
+.status-badge--membership-aktivirano {
+  border-color: rgba(37, 211, 102, 0.42);
+  background: rgba(37, 211, 102, 0.12);
+  color: #9cffbd;
+}
+
+.status-badge--membership-na_cekanju {
+  border-color: rgba(255, 209, 102, 0.5);
+  background: rgba(255, 209, 102, 0.14);
+  color: #ffe08a;
+}
+
+.status-badge--membership-blokirano {
+  border-color: rgba(255, 116, 129, 0.42);
+  background: rgba(226, 29, 47, 0.12);
+  color: #ff9aa4;
+}
+
+.membership-edit-form {
+  scroll-margin-top: 96px;
+}
+
+.edit-form-heading {
+  display: grid;
+  gap: 4px;
+}
+
+.edit-form-heading h2,
+.edit-form-heading p {
+  margin: 0;
+}
+
+.edit-form-heading p {
+  color: var(--muted);
+  font-weight: 800;
+  overflow-wrap: anywhere;
 }
 
 .progress-meter {
@@ -933,6 +1276,18 @@ tbody tr:hover {
   min-width: min(100%, 220px);
 }
 
+.check-in-mobile-filters {
+  display: none;
+}
+
+.check-in-mobile-filters label {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  color: #f2f3f5;
+  font-weight: 800;
+}
+
 @media (max-width: 1024px) {
   .section {
     padding-inline: 22px;
@@ -1091,6 +1446,10 @@ tbody tr:hover {
     width: 100%;
     min-width: 0;
   }
+
+  .table-wrap td.row-actions {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 620px) {
@@ -1143,6 +1502,16 @@ tbody tr:hover {
     flex: 1 1 150px;
   }
 
+  .monthly-goal-row {
+    display: grid;
+    align-items: stretch;
+  }
+
+  .monthly-goal-field,
+  .monthly-goal-row .btn {
+    width: 100%;
+  }
+
   .panel-topbar > strong {
     max-width: 100%;
     overflow-wrap: anywhere;
@@ -1157,6 +1526,26 @@ tbody tr:hover {
   }
 
   .panel-toolbar label {
+    width: 100%;
+  }
+
+  .check-in-filters {
+    display: none;
+  }
+
+  .check-in-mobile-filters {
+    display: grid;
+    gap: 14px;
+    padding: 18px;
+  }
+
+  .check-in-mobile-filters .form-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .check-in-mobile-filters .btn {
     width: 100%;
   }
 
@@ -1199,7 +1588,7 @@ tbody tr:hover {
     left: 0;
     z-index: 35;
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     gap: 6px;
     padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
     border-top: 1px solid var(--line);
@@ -1270,6 +1659,10 @@ tbody tr:hover {
   }
 
   .row-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .check-in-mobile-filters .form-actions {
     grid-template-columns: 1fr;
   }
 

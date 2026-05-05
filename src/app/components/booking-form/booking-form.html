@@ -84,12 +84,14 @@
         </label>
 
         <label>
+          @let trainers = trainerService.trainers();
+
           Izaberi trenera
           <select formControlName="trainerId">
             <option value="">Izaberi trenera</option>
             <option value="no-preference">Nije bitno - predlozite mi trenera</option>
-            @if (trainerService.trainers().length) {
-              @for (trainer of trainerService.trainers(); track trainer.id) {
+            @if (trainers.length) {
+              @for (trainer of trainers; track trainer.id) {
                 <option [value]="trainer.id">{{ trainer.name }}</option>
               }
             } @else {

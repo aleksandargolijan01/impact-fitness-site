@@ -1,0 +1,89 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isPublicContentCollection(collectionName) {
+      return collectionName in ['pricing', 'trainers', 'services', 'gallery'];
+    }
+
+    match /users/{userId} {
+      allow create: if isOwner(userId)
+        && request.resource.data.id == userId
+        && (
+          request.resource.data.role == 'user'
+          || (
+            request.auth.token.email == 'admin@impactfitness.com'
+            && request.resource.data.role == 'admin'
+          )
+        );
+      allow read: if isOwner(userId) || isAdmin();
+      allow update: if isAdmin()
+        || (
+          isOwner(userId)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'fullName',
+            'phone',
+            'email'
+          ])
+        );
+      allow delete: if false;
+    }
+
+    match /{collectionName}/{documentId} {
+      allow read: if isPublicContentCollection(collectionName);
+      allow write: if isAdmin() && isPublicContentCollection(collectionName);
+    }
+
+    match /bookings/{bookingId} {
+      allow create: if true;
+      allow read: if isAdmin() || isOwner(resource.data.userId);
+      allow update, delete: if isAdmin()
+        || (
+          signedIn()
+          && isOwner(resource.data.userId)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+          && request.resource.data.status == 'otkazano'
+        );
+    }
+
+    match /membershipApplications/{applicationId} {
+      allow create: if signedIn() && isOwner(request.resource.data.userId);
+      allow read: if isAdmin() || isOwner(resource.data.userId);
+      allow update, delete: if isAdmin();
+    }
+
+    match /checkIns/{checkInId} {
+      allow create: if signedIn() && isOwner(request.resource.data.userId);
+      allow read: if isAdmin() || isOwner(resource.data.userId);
+      allow update, delete: if isAdmin();
+    }
+
+    match /userGoals/{goalId} {
+      allow create: if signedIn() && isOwner(request.resource.data.userId);
+      allow read, update, delete: if isAdmin() || isOwner(resource.data.userId);
+    }
+
+    match /notifications/{notificationId} {
+      allow read: if isAdmin() || isOwner(resource.data.userId);
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

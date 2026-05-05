@@ -4,6 +4,7 @@ import { Observable, catchError, combineLatest, map, of } from 'rxjs';
 import {
   MembershipApplication,
   MembershipApplicationStatus,
+  normalizeMembershipStatus,
 } from '../models/membership-application.model';
 import { AuthService } from './auth.service';
 import { FirestoreCollectionService } from './firestore-collection.service';
@@ -12,6 +13,21 @@ export type CreateMembershipApplicationPayload = Omit<
   MembershipApplication,
   'id' | 'status' | 'createdAt'
 >;
+
+export type UpdateMembershipApplicationPayload = Pick<
+  MembershipApplication,
+  | 'id'
+  | 'fullName'
+  | 'email'
+  | 'phone'
+  | 'packageName'
+  | 'packagePrice'
+  | 'startDate'
+  | 'documentNumber'
+  | 'note'
+> & {
+  status: MembershipApplicationStatus;
+};
 
 @Injectable({
   providedIn: 'root',
@@ -83,7 +99,7 @@ export class MembershipApplicationService {
       email: application.email.trim().toLowerCase(),
       startDate: application.startDate || new Date().toISOString().slice(0, 10),
       id: this.firestore.createId(this.collectionPath),
-      status: 'novo',
+      status: 'na_cekanju',
       createdAt: new Date().toISOString(),
     };
 
@@ -97,7 +113,31 @@ export class MembershipApplicationService {
       throw new Error(`Membership application ${id} was not found.`);
     }
 
-    await this.firestore.update(this.collectionPath, { ...application, status });
+    await this.firestore.update(this.collectionPath, {
+      ...application,
+      status: normalizeMembershipStatus(status),
+    });
+  }
+
+  async updateApplication(payload: UpdateMembershipApplicationPayload): Promise<void> {
+    const application = this.applicationsState().find((item) => item.id === payload.id);
+
+    if (!application) {
+      throw new Error(`Membership application ${payload.id} was not found.`);
+    }
+
+    await this.firestore.update(this.collectionPath, {
+      ...application,
+      fullName: payload.fullName.trim(),
+      email: payload.email.trim().toLowerCase(),
+      phone: payload.phone.trim(),
+      packageName: payload.packageName.trim(),
+      packagePrice: payload.packagePrice.trim(),
+      startDate: payload.startDate,
+      documentNumber: payload.documentNumber.trim(),
+      note: payload.note.trim(),
+      status: normalizeMembershipStatus(payload.status),
+    });
   }
 
   async deleteApplication(id: string): Promise<void> {

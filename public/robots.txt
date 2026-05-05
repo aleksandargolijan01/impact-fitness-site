@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://impactwebsite-9850b.web.app/sitemap.xml

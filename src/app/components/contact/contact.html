@@ -1,4 +1,6 @@
 <section class="section" id="contact">
+  @let schedule = contentService.schedule();
+
   <div class="container contact-grid">
     <div>
       <p class="section-kicker">Kontakt</p>
@@ -9,11 +11,11 @@
         <p><strong>Email:</strong> impactfitness@example.com</p>
         <p>
           <strong>Radno vreme:</strong>
-          {{ contentService.schedule().weekdayLabel }} {{ contentService.schedule().weekdayHours }}
+          {{ schedule.weekdayLabel }} {{ schedule.weekdayHours }}
         </p>
         <p>
           <strong>Vikend:</strong>
-          {{ contentService.schedule().weekendLabel }} {{ contentService.schedule().weekendHours }}
+          {{ schedule.weekendLabel }} {{ schedule.weekendHours }}
         </p>
       </div>
       <div class="contact-actions">

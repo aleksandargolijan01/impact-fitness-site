@@ -22,6 +22,7 @@ import { AuthService } from '../../services/auth.service';
           <a routerLink="/admin/bookings" routerLinkActive="active">Zahtevi</a>
           <a routerLink="/admin/memberships" routerLinkActive="active">Clanarine</a>
           <a routerLink="/admin/check-ins" routerLinkActive="active">Dolasci</a>
+          <a routerLink="/admin/users" routerLinkActive="active">Korisnici</a>
         </nav>
       </aside>
 

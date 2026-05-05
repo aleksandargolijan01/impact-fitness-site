@@ -16,6 +16,7 @@ import { AuthService } from '../../services/auth.service';
         <nav>
           <a routerLink="/user/dashboard" routerLinkActive="active">Dashboard</a>
           <a routerLink="/user/check-in" routerLinkActive="active">Cekiraj se</a>
+          <a routerLink="/user/progress" routerLinkActive="active">Napredak</a>
           <a routerLink="/user/bookings" routerLinkActive="active">Moji zahtevi</a>
           <a routerLink="/user/memberships" routerLinkActive="active">Moje clanarine</a>
           <a routerLink="/user/profile" routerLinkActive="active">Profil</a>
@@ -36,6 +37,7 @@ import { AuthService } from '../../services/auth.service';
       <nav class="mobile-bottom-nav" aria-label="Korisnicka navigacija">
         <a routerLink="/user/dashboard" routerLinkActive="active">Home</a>
         <a routerLink="/user/check-in" routerLinkActive="active">Check-in</a>
+        <a routerLink="/user/progress" routerLinkActive="active">Napred.</a>
         <a routerLink="/user/bookings" routerLinkActive="active">Zahtevi</a>
         <a routerLink="/user/memberships" routerLinkActive="active">Clanar.</a>
         <a routerLink="/user/profile" routerLinkActive="active">Profil</a>

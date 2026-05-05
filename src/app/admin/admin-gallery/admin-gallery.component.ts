@@ -26,9 +26,9 @@ import { GalleryService } from '../../services/gallery.service';
         <label>Image URL <input formControlName="imageUrl" /></label>
         <label>Alt tekst <input formControlName="altText" /></label>
         <label>Kategorija <input formControlName="category" /></label>
-        <label class="check-row">
+        <label class="checkbox-row">
           <input type="checkbox" formControlName="wide" />
-          Sirina 2 kolone na javnoj galeriji
+          <span>Sirina 2 kolone na javnoj galeriji</span>
         </label>
         <div class="form-actions full">
           <button class="btn btn--primary" type="submit" [disabled]="isSaving()">

@@ -33,9 +33,9 @@ import { PricingService } from '../../services/pricing.service';
           Lista benefita, jedan po redu
           <textarea formControlName="benefitsText" rows="5"></textarea>
         </label>
-        <label class="check-row">
+        <label class="checkbox-row">
           <input type="checkbox" formControlName="popular" />
-          Popularan paket
+          <span>Popularan paket</span>
         </label>
         <div class="form-actions full">
           <button class="btn btn--primary" type="submit" [disabled]="isSaving()">

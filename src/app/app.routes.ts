@@ -1,23 +1,7 @@
 import { Routes } from '@angular/router';
-import { AdminBookingsComponent } from './admin/admin-bookings/admin-bookings.component';
-import { AdminDashboardComponent } from './admin/admin-dashboard/admin-dashboard.component';
-import { AdminGalleryComponent } from './admin/admin-gallery/admin-gallery.component';
-import { AdminMembershipsComponent } from './admin/admin-memberships/admin-memberships.component';
-import { AdminPricingComponent } from './admin/admin-pricing/admin-pricing.component';
-import { AdminServicesComponent } from './admin/admin-services/admin-services.component';
-import { AdminShellComponent } from './admin/admin-shell/admin-shell.component';
-import { AdminTrainersComponent } from './admin/admin-trainers/admin-trainers.component';
 import { adminAuthGuard } from './guards/admin-auth.guard';
 import { userAuthGuard } from './guards/user-auth.guard';
-import { MembershipCheckoutComponent } from './membership/membership-checkout.component';
 import { HomePage } from './pages/home-page/home-page';
-import { UserBookingsComponent } from './user/user-bookings/user-bookings.component';
-import { UserDashboardComponent } from './user/user-dashboard/user-dashboard.component';
-import { UserLoginComponent } from './user/user-login/user-login.component';
-import { UserMembershipsComponent } from './user/user-memberships/user-memberships.component';
-import { UserProfileComponent } from './user/user-profile/user-profile.component';
-import { UserRegisterComponent } from './user/user-register/user-register.component';
-import { UserShellComponent } from './user/user-shell/user-shell.component';
 
 export const routes: Routes = [
   {
@@ -26,11 +10,13 @@ export const routes: Routes = [
   },
   {
     path: 'login',
-    component: UserLoginComponent,
+    loadComponent: () =>
+      import('./user/user-login/user-login.component').then((m) => m.UserLoginComponent),
   },
   {
     path: 'register',
-    component: UserRegisterComponent,
+    loadComponent: () =>
+      import('./user/user-register/user-register.component').then((m) => m.UserRegisterComponent),
   },
   {
     path: 'admin/login',
@@ -39,23 +25,69 @@ export const routes: Routes = [
   },
   {
     path: 'membership/checkout/:packageId',
-    component: MembershipCheckoutComponent,
+    loadComponent: () =>
+      import('./membership/membership-checkout.component').then(
+        (m) => m.MembershipCheckoutComponent,
+      ),
     canActivate: [userAuthGuard],
   },
   {
     path: 'admin',
-    component: AdminShellComponent,
+    loadComponent: () =>
+      import('./admin/admin-shell/admin-shell.component').then((m) => m.AdminShellComponent),
     canActivate: [adminAuthGuard],
     canActivateChild: [adminAuthGuard],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-      { path: 'dashboard', component: AdminDashboardComponent },
-      { path: 'pricing', component: AdminPricingComponent },
-      { path: 'trainers', component: AdminTrainersComponent },
-      { path: 'services', component: AdminServicesComponent },
-      { path: 'gallery', component: AdminGalleryComponent },
-      { path: 'bookings', component: AdminBookingsComponent },
-      { path: 'memberships', component: AdminMembershipsComponent },
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./admin/admin-dashboard/admin-dashboard.component').then(
+            (m) => m.AdminDashboardComponent,
+          ),
+      },
+      {
+        path: 'pricing',
+        loadComponent: () =>
+          import('./admin/admin-pricing/admin-pricing.component').then(
+            (m) => m.AdminPricingComponent,
+          ),
+      },
+      {
+        path: 'trainers',
+        loadComponent: () =>
+          import('./admin/admin-trainers/admin-trainers.component').then(
+            (m) => m.AdminTrainersComponent,
+          ),
+      },
+      {
+        path: 'services',
+        loadComponent: () =>
+          import('./admin/admin-services/admin-services.component').then(
+            (m) => m.AdminServicesComponent,
+          ),
+      },
+      {
+        path: 'gallery',
+        loadComponent: () =>
+          import('./admin/admin-gallery/admin-gallery.component').then(
+            (m) => m.AdminGalleryComponent,
+          ),
+      },
+      {
+        path: 'bookings',
+        loadComponent: () =>
+          import('./admin/admin-bookings/admin-bookings.component').then(
+            (m) => m.AdminBookingsComponent,
+          ),
+      },
+      {
+        path: 'memberships',
+        loadComponent: () =>
+          import('./admin/admin-memberships/admin-memberships.component').then(
+            (m) => m.AdminMembershipsComponent,
+          ),
+      },
       {
         path: 'check-ins',
         loadComponent: () =>
@@ -82,14 +114,31 @@ export const routes: Routes = [
   },
   {
     path: 'user',
-    component: UserShellComponent,
+    loadComponent: () =>
+      import('./user/user-shell/user-shell.component').then((m) => m.UserShellComponent),
     canActivate: [userAuthGuard],
     canActivateChild: [userAuthGuard],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-      { path: 'dashboard', component: UserDashboardComponent },
-      { path: 'bookings', component: UserBookingsComponent },
-      { path: 'memberships', component: UserMembershipsComponent },
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./user/user-dashboard/user-dashboard.component').then(
+            (m) => m.UserDashboardComponent,
+          ),
+      },
+      {
+        path: 'bookings',
+        loadComponent: () =>
+          import('./user/user-bookings/user-bookings.component').then((m) => m.UserBookingsComponent),
+      },
+      {
+        path: 'memberships',
+        loadComponent: () =>
+          import('./user/user-memberships/user-memberships.component').then(
+            (m) => m.UserMembershipsComponent,
+          ),
+      },
       {
         path: 'check-in',
         loadComponent: () =>
@@ -104,7 +153,11 @@ export const routes: Routes = [
             (m) => m.UserProgressComponent,
           ),
       },
-      { path: 'profile', component: UserProfileComponent },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('./user/user-profile/user-profile.component').then((m) => m.UserProfileComponent),
+      },
     ],
   },
   {

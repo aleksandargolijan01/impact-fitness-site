@@ -1,11 +1,15 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { MembershipApplication } from '../../models/membership-application.model';
+import {
+  MembershipApplication,
+  getMembershipStatusClass,
+  getMembershipStatusLabel,
+  isMembershipActive,
+  normalizeMembershipStatus,
+} from '../../models/membership-application.model';
 import { AuthService } from '../../services/auth.service';
 import { MembershipApplicationService } from '../../services/membership-application.service';
 import { ScrollService } from '../../services/scroll.service';
-
-type MembershipDisplayStatus = 'active' | 'expiring' | 'expired';
 
 interface MembershipViewModel {
   application: MembershipApplication;
@@ -99,7 +103,8 @@ export class UserMembershipsComponent {
       .map((application) => this.toMembershipViewModel(application))
       .sort((a, b) => {
         const activeOrder =
-          Number(this.isActiveStatus(b.statusLabel)) - Number(this.isActiveStatus(a.statusLabel));
+          Number(isMembershipActive(b.application.status)) -
+          Number(isMembershipActive(a.application.status));
 
         return activeOrder || b.sortTime - a.sortTime;
       }),
@@ -108,45 +113,29 @@ export class UserMembershipsComponent {
   private toMembershipViewModel(application: MembershipApplication): MembershipViewModel {
     const startDate = this.parseDate(application.startDate || application.createdAt);
     const endDate = startDate ? this.addOneMonth(startDate) : null;
-    const status = this.getDisplayStatus(endDate);
 
     return {
       application,
       startDate,
       endDate,
-      statusLabel: this.getStatusLabel(status),
-      statusClass: `status-badge--${status}`,
-      expirationText: this.getExpirationText(endDate),
+      statusLabel: getMembershipStatusLabel(application.status),
+      statusClass: getMembershipStatusClass(application.status),
+      expirationText: this.getMembershipText(application, endDate),
       sortTime: startDate?.getTime() ?? 0,
     };
   }
 
-  private getDisplayStatus(endDate: Date | null): MembershipDisplayStatus {
-    if (!endDate) {
-      return 'expired';
+  private getMembershipText(application: MembershipApplication, endDate: Date | null): string {
+    const status = normalizeMembershipStatus(application.status);
+
+    if (status === 'na_cekanju') {
+      return 'Zahtev je u obradi.';
     }
 
-    const today = this.startOfDay(new Date());
-    const expirationDate = this.startOfDay(endDate);
-    const daysUntilExpiration =
-      (expirationDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
-
-    if (daysUntilExpiration < 0) {
-      return 'expired';
+    if (status === 'blokirano') {
+      return 'Clanarina je blokirana.';
     }
 
-    return daysUntilExpiration < 5 ? 'expiring' : 'active';
-  }
-
-  private getStatusLabel(status: MembershipDisplayStatus): string {
-    if (status === 'expiring') {
-      return 'Istice uskoro';
-    }
-
-    return status === 'active' ? 'Aktivna' : 'Istekla';
-  }
-
-  private getExpirationText(endDate: Date | null): string {
     if (!endDate) {
       return 'Datum isteka nije dostupan.';
     }
@@ -158,10 +147,6 @@ export class UserMembershipsComponent {
     return daysLeft >= 0
       ? `Clanarina istice za ${Math.ceil(daysLeft)} dana.`
       : `Clanarina je istekla pre ${Math.abs(Math.floor(daysLeft))} dana.`;
-  }
-
-  private isActiveStatus(statusLabel: string): boolean {
-    return statusLabel === 'Aktivna' || statusLabel === 'Istice uskoro';
   }
 
   private addOneMonth(date: Date): Date {
