@@ -24,7 +24,7 @@ import { AdminAuthService } from '../../services/admin-auth.service';
         </label>
         <label>
           Password
-          <input type="password" formControlName="password" placeholder="admin123" />
+          <input type="password" formControlName="password" placeholder="Unesi admin password" />
         </label>
         <button class="btn btn--primary" type="submit">Prijavi se</button>
         <a routerLink="/">Nazad na sajt</a>

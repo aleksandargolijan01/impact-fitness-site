@@ -32,7 +32,7 @@ describe('UserLoginComponent', () => {
 
     fixture.componentInstance.form.setValue({
       email: 'admin@impactfitness.com',
-      password: 'admin123',
+      password: 'TestPassword123!',
     });
     await fixture.componentInstance.submit();
 
@@ -54,7 +54,7 @@ describe('UserLoginComponent', () => {
 
     fixture.componentInstance.form.setValue({
       email: 'petar@example.com',
-      password: 'secret123',
+      password: 'TestPassword123!',
     });
     await fixture.componentInstance.submit();
 

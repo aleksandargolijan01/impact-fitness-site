@@ -40,7 +40,7 @@ import { ScrollService } from '../services/scroll.service';
         <label>Napomena <textarea rows="4" formControlName="note"></textarea></label>
         <label class="check-row">
           <input type="checkbox" formControlName="confirmation" />
-          Clanarinu zavrsavam i karticu preuzimam u teretani
+          <span>Clanarinu zavrsavam i karticu preuzimam u teretani</span>
         </label>
 
         <button class="btn btn--primary" type="submit" [disabled]="isSaving || !selectedPackage()">

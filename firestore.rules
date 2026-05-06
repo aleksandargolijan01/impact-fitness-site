@@ -16,13 +16,186 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
 
-    function isPublicContentCollection(collectionName) {
+    function isString(value) {
+      return value is string;
+    }
+
+    function validEmail(value) {
+      return isString(value) && value.matches('^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$');
+    }
+
+    function validRole(value) {
+      return value in ['admin', 'user'];
+    }
+
+    function validBookingStatus(value) {
+      return value in ['novo', 'kontaktirano', 'zavrseno', 'otkazano'];
+    }
+
+    function validMembershipStatus(value) {
+      return value in ['aktivirano', 'na_cekanju', 'blokirano'];
+    }
+
+    function validPublicContentCollection(collectionName) {
       return collectionName in ['pricing', 'trainers', 'services', 'gallery'];
+    }
+
+    function validUser(data, userId) {
+      return data.keys().hasAll(['id', 'fullName', 'email', 'phone', 'role', 'createdAt'])
+        && data.keys().hasOnly(['id', 'fullName', 'email', 'phone', 'role', 'active', 'createdAt'])
+        && data.id == userId
+        && isString(data.fullName)
+        && validEmail(data.email)
+        && isString(data.phone)
+        && validRole(data.role)
+        && (!('active' in data) || data.active is bool)
+        && isString(data.createdAt);
+    }
+
+    function validBooking(data) {
+      return data.keys().hasAll([
+          'id',
+          'fullName',
+          'phone',
+          'email',
+          'goal',
+          'serviceType',
+          'message',
+          'userId',
+          'source',
+          'submittedAt',
+          'status'
+        ])
+        && data.keys().hasOnly([
+          'id',
+          'fullName',
+          'phone',
+          'email',
+          'goal',
+          'serviceType',
+          'service',
+          'trainerId',
+          'trainerName',
+          'message',
+          'userId',
+          'preferredDate',
+          'preferredTime',
+          'date',
+          'time',
+          'createdAt',
+          'source',
+          'submittedAt',
+          'status'
+        ])
+        && isString(data.id)
+        && isString(data.fullName)
+        && isString(data.phone)
+        && validEmail(data.email)
+        && isString(data.goal)
+        && isString(data.serviceType)
+        && isString(data.message)
+        && isString(data.userId)
+        && data.source in ['public', 'user']
+        && isString(data.submittedAt)
+        && validBookingStatus(data.status);
+    }
+
+    function validMembershipApplication(data) {
+      return data.keys().hasAll([
+          'id',
+          'userId',
+          'fullName',
+          'email',
+          'phone',
+          'packageId',
+          'packageName',
+          'packagePrice',
+          'startDate',
+          'documentNumber',
+          'note',
+          'status',
+          'createdAt'
+        ])
+        && data.keys().hasOnly([
+          'id',
+          'userId',
+          'fullName',
+          'email',
+          'phone',
+          'packageId',
+          'packageName',
+          'packagePrice',
+          'startDate',
+          'documentNumber',
+          'note',
+          'status',
+          'createdAt'
+        ])
+        && isString(data.id)
+        && isString(data.userId)
+        && isString(data.fullName)
+        && validEmail(data.email)
+        && isString(data.phone)
+        && isString(data.packageId)
+        && isString(data.packageName)
+        && isString(data.packagePrice)
+        && isString(data.startDate)
+        && isString(data.documentNumber)
+        && isString(data.note)
+        && validMembershipStatus(data.status)
+        && isString(data.createdAt);
+    }
+
+    function validCheckIn(data) {
+      return data.keys().hasAll([
+          'id',
+          'userId',
+          'fullName',
+          'email',
+          'date',
+          'time',
+          'createdAt',
+          'qrCodeValue'
+        ])
+        && data.keys().hasOnly([
+          'id',
+          'userId',
+          'fullName',
+          'email',
+          'date',
+          'time',
+          'createdAt',
+          'qrCodeValue'
+        ])
+        && isString(data.id)
+        && isString(data.userId)
+        && isString(data.fullName)
+        && validEmail(data.email)
+        && isString(data.date)
+        && isString(data.time)
+        && data.createdAt is timestamp
+        && data.qrCodeValue in ['IMPACT_GYM_CHECKIN', 'ADMIN_MANUAL_CHECKIN'];
+    }
+
+    function validUserGoal(data) {
+      return data.keys().hasAll(['id', 'userId', 'monthlyGoal', 'month', 'year'])
+        && data.keys().hasOnly(['id', 'userId', 'monthlyGoal', 'month', 'year'])
+        && isString(data.id)
+        && isString(data.userId)
+        && data.monthlyGoal is number
+        && data.monthlyGoal >= 1
+        && data.monthlyGoal <= 31
+        && data.month is number
+        && data.month >= 1
+        && data.month <= 12
+        && data.year is number
+        && data.year >= 2024
+        && data.year <= 2100;
     }
 
     match /users/{userId} {
       allow create: if isOwner(userId)
-        && request.resource.data.id == userId
+        && validUser(request.resource.data, userId)
         && (
           request.resource.data.role == 'user'
           || (
@@ -34,6 +207,8 @@ service cloud.firestore {
       allow update: if isAdmin()
         || (
           isOwner(userId)
+          && validUser(request.resource.data, userId)
+          && request.resource.data.role == resource.data.role
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
             'fullName',
             'phone',
@@ -44,37 +219,74 @@ service cloud.firestore {
     }
 
     match /{collectionName}/{documentId} {
-      allow read: if isPublicContentCollection(collectionName);
-      allow write: if isAdmin() && isPublicContentCollection(collectionName);
+      allow read: if validPublicContentCollection(collectionName);
+      allow write: if isAdmin() && validPublicContentCollection(collectionName);
     }
 
     match /bookings/{bookingId} {
-      allow create: if true;
+      allow create: if validBooking(request.resource.data)
+        && request.resource.data.id == bookingId
+        && request.resource.data.status == 'novo'
+        && (
+          (
+            request.resource.data.source == 'public'
+            && request.resource.data.userId == ''
+          )
+          || (
+            signedIn()
+            && request.resource.data.source == 'user'
+            && request.resource.data.userId == request.auth.uid
+          )
+        );
       allow read: if isAdmin() || isOwner(resource.data.userId);
       allow update, delete: if isAdmin()
         || (
           signedIn()
           && isOwner(resource.data.userId)
+          && validBooking(request.resource.data)
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
           && request.resource.data.status == 'otkazano'
         );
     }
 
     match /membershipApplications/{applicationId} {
-      allow create: if signedIn() && isOwner(request.resource.data.userId);
+      allow create: if signedIn()
+        && validMembershipApplication(request.resource.data)
+        && request.resource.data.id == applicationId
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.status == 'na_cekanju';
       allow read: if isAdmin() || isOwner(resource.data.userId);
-      allow update, delete: if isAdmin();
+      allow update: if isAdmin() && validMembershipApplication(request.resource.data);
+      allow delete: if isAdmin();
     }
 
     match /checkIns/{checkInId} {
-      allow create: if signedIn() && isOwner(request.resource.data.userId);
+      allow create: if validCheckIn(request.resource.data)
+        && request.resource.data.id == checkInId
+        && (
+          (
+            signedIn()
+            && request.resource.data.userId == request.auth.uid
+            && request.resource.data.qrCodeValue == 'IMPACT_GYM_CHECKIN'
+          )
+          || (
+            isAdmin()
+            && request.resource.data.qrCodeValue == 'ADMIN_MANUAL_CHECKIN'
+          )
+        );
       allow read: if isAdmin() || isOwner(resource.data.userId);
       allow update, delete: if isAdmin();
     }
 
     match /userGoals/{goalId} {
-      allow create: if signedIn() && isOwner(request.resource.data.userId);
-      allow read, update, delete: if isAdmin() || isOwner(resource.data.userId);
+      allow create, update: if signedIn()
+        && validUserGoal(request.resource.data)
+        && request.resource.data.id == goalId
+        && (
+          isAdmin()
+          || request.resource.data.userId == request.auth.uid
+        );
+      allow read, delete: if isAdmin() || isOwner(resource.data.userId);
     }
 
     match /notifications/{notificationId} {

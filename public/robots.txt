@@ -1,4 +1,12 @@
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /user
+Disallow: /user/
+Disallow: /login
+Disallow: /register
+Disallow: /membership
+Disallow: /membership/
 
 Sitemap: https://impactwebsite-9850b.web.app/sitemap.xml
